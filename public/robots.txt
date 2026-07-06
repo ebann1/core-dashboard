@@ -1,0 +1,3 @@
+# C.O.R.E. — private. No indexing, no scraping.
+User-agent: *
+Disallow: /

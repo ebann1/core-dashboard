@@ -1,33 +1,33 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Share_Tech_Mono, Rajdhani } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const shareTechMono = Share_Tech_Mono({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-share-tech",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const rajdhani = Rajdhani({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
+  variable: "--font-rajdhani",
 });
 
 export const metadata: Metadata = {
-  title: "C.O.R.E. — Cognitive Orchestration Runtime Engine",
-  description: "Cognitive Orchestration Runtime Engine dashboard",
+  title: "C.O.R.E.",
+  description: "Cognitive Orchestration Runtime Engine",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${shareTechMono.variable} ${rajdhani.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }
