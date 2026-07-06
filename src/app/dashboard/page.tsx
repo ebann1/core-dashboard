@@ -1,18 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { commandColumns } from "@/lib/commands";
+import { useState, useEffect, useRef } from "react";
+import { commandColumns, type Command } from "@/lib/commands";
 import NeuralOrb from "@/components/NeuralOrb";
 import styles from "./dashboard.module.css";
 
 export default function Dashboard() {
   const [clock, setClock] = useState("--:--:--");
   const [clockDate, setClockDate] = useState("— — —");
-  const [done, setDone] = useState<Set<string>>(
-    new Set(["/brainstorm", "/new-project", "/prd", "/viability", "/ui-brief"])
-  );
+  const [used, setUsed] = useState<Set<string>>(new Set());
+  const [flashing, setFlashing] = useState<Set<string>>(new Set());
+  const flashTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const [gitStatus, setGitStatus] = useState("working tree clean");
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const timers = flashTimers.current;
+    return () => timers.forEach((t) => clearTimeout(t));
+  }, []);
 
   useEffect(() => {
     const tick = () => {
@@ -27,13 +32,32 @@ export default function Dashboard() {
     return () => clearInterval(id);
   }, []);
 
-  const toggle = (cmd: string) => {
-    setDone((prev) => {
-      const next = new Set(prev);
-      if (next.has(cmd)) next.delete(cmd);
-      else next.add(cmd);
-      return next;
-    });
+  const fire = (item: Command) => {
+    if (!item.active) return;
+    navigator.clipboard.writeText(item.prompt ?? "").catch(() => {});
+    setUsed((prev) => new Set(prev).add(item.cmd));
+    setFlashing((prev) => new Set(prev).add(item.cmd));
+    const timers = flashTimers.current;
+    const existing = timers.get(item.cmd);
+    if (existing) clearTimeout(existing);
+    timers.set(
+      item.cmd,
+      setTimeout(() => {
+        setFlashing((prev) => {
+          const next = new Set(prev);
+          next.delete(item.cmd);
+          return next;
+        });
+        timers.delete(item.cmd);
+      }, 1000)
+    );
+  };
+
+  const resetSession = () => {
+    flashTimers.current.forEach((t) => clearTimeout(t));
+    flashTimers.current.clear();
+    setUsed(new Set());
+    setFlashing(new Set());
   };
 
   const doPull = () => {
@@ -181,6 +205,7 @@ export default function Dashboard() {
           <div className={styles.gitBtns}>
             <button className={`${styles.gitBtn} ${styles.btnPull}`} onClick={doPull}>⇣ PULL</button>
             <button className={`${styles.gitBtn} ${styles.btnCommit}`} onClick={doCommit}>⇡ COMMIT</button>
+            <button className={`${styles.gitBtn} ${styles.btnReset}`} onClick={resetSession}>↺ RESET SESSION</button>
           </div>
         </div>
         <div className={styles.gitStatusLine}>{gitStatus}</div>
@@ -195,8 +220,15 @@ export default function Dashboard() {
               {c.items.map((item) => (
                 <button
                   key={item.cmd}
-                  className={`${styles.cmdBtn} ${done.has(item.cmd) ? styles.cmdDone : ""}`}
-                  onClick={() => toggle(item.cmd)}
+                  className={[
+                    styles.cmdBtn,
+                    !item.active ? styles.cmdInactive : "",
+                    item.active && used.has(item.cmd) ? styles.cmdDone : "",
+                    item.active && flashing.has(item.cmd) ? styles.cmdFlash : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onClick={() => fire(item)}
                   onMouseEnter={(e) =>
                     setTooltip({ text: item.tip, x: e.clientX, y: e.clientY })
                   }
