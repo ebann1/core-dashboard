@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { commandColumns, type Command } from "@/lib/commands";
+import { commandColumns, type Command, type Tier, type RiskFlag } from "@/lib/commands";
 import NeuralOrb from "@/components/NeuralOrb";
 import styles from "./dashboard.module.css";
 
@@ -23,7 +23,23 @@ const COLUMN_PREREQ: Record<string, string[]> = {
   Legal: ["Frontend", "Backend"],
 };
 
-type Status = "queued" | "ready" | "done" | "backlog";
+const TIER_RANK: Record<Tier, number> = { simple: 0, standard: 1, thorough: 2 };
+const TIERS: Tier[] = ["simple", "standard", "thorough"];
+const RISK_FLAGS: { flag: RiskFlag; label: string }[] = [
+  { flag: "payments", label: "Payments" },
+  { flag: "health", label: "Health data" },
+  { flag: "minors", label: "Minors" },
+  { flag: "eu", label: "EU users" },
+  { flag: "ugc", label: "UGC" },
+];
+
+type Status = "unused" | "queued" | "ready" | "done" | "backlog";
+
+function inScope(item: Command, tier: Tier, riskFlags: Set<RiskFlag>): boolean {
+  if (item.riskFlag) return riskFlags.has(item.riskFlag);
+  const itemTier = item.tier ?? "standard";
+  return TIER_RANK[itemTier] <= TIER_RANK[tier];
+}
 
 function firstItemDone(colName: string, used: Set<string>): boolean {
   const col = commandColumns.find((c) => c.col === colName);
@@ -35,9 +51,12 @@ function getStatus(
   col: { col: string; items: Command[] },
   item: Command,
   indexInCol: number,
-  used: Set<string>
+  used: Set<string>,
+  tier: Tier,
+  riskFlags: Set<RiskFlag>
 ): Status {
   if (used.has(item.cmd)) return "done";
+  if (!inScope(item, tier, riskFlags)) return "unused";
 
   if (ELECTIVE_COLUMNS.has(col.col)) return "ready";
 
@@ -60,10 +79,53 @@ function getStatus(
   return used.has(col.items[indexInCol - 1].cmd) ? "ready" : "queued";
 }
 
+interface StoredState {
+  used: string[];
+  tier: Tier;
+  riskFlags: RiskFlag[];
+}
+
+function storageKey(project: string): string {
+  return `core-dashboard:${project}`;
+}
+
+function loadStored(project: string): StoredState {
+  try {
+    const raw = localStorage.getItem(storageKey(project));
+    if (raw) {
+      const data = JSON.parse(raw) as StoredState;
+      return {
+        used: data.used ?? [],
+        tier: data.tier ?? "standard",
+        riskFlags: data.riskFlags ?? [],
+      };
+    }
+  } catch {
+    // fall through to defaults
+  }
+  return { used: [], tier: "standard", riskFlags: [] };
+}
+
 export default function Dashboard() {
+  const [project, setProject] = useState("Project Alpha");
+  // Keying ProjectBoard by project forces a full remount on switch, so each
+  // project's used/tier/riskFlags load fresh via lazy useState initializers
+  // instead of a load-effect (which would call setState inside an effect).
+  return <ProjectBoard key={project} project={project} onProjectChange={setProject} />;
+}
+
+function ProjectBoard({
+  project,
+  onProjectChange,
+}: {
+  project: string;
+  onProjectChange: (p: string) => void;
+}) {
   const [clock, setClock] = useState("--:--:--");
   const [clockDate, setClockDate] = useState("— — —");
-  const [used, setUsed] = useState<Set<string>>(new Set());
+  const [used, setUsed] = useState<Set<string>>(() => new Set(loadStored(project).used));
+  const [tier, setTier] = useState<Tier>(() => loadStored(project).tier);
+  const [riskFlags, setRiskFlags] = useState<Set<RiskFlag>>(() => new Set(loadStored(project).riskFlags));
   const [flashing, setFlashing] = useState<Set<string>>(new Set());
   const flashTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const [gitStatus, setGitStatus] = useState("working tree clean");
@@ -73,6 +135,21 @@ export default function Dashboard() {
     const timers = flashTimers.current;
     return () => timers.forEach((t) => clearTimeout(t));
   }, []);
+
+  // Persist whenever progress, tier, or risk flags change for this project.
+  useEffect(() => {
+    const data: StoredState = { used: [...used], tier, riskFlags: [...riskFlags] };
+    localStorage.setItem(storageKey(project), JSON.stringify(data));
+  }, [used, tier, riskFlags, project]);
+
+  const toggleRiskFlag = (flag: RiskFlag) => {
+    setRiskFlags((prev) => {
+      const next = new Set(prev);
+      if (next.has(flag)) next.delete(flag);
+      else next.add(flag);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const tick = () => {
@@ -134,7 +211,11 @@ export default function Dashboard() {
         </div>
         <div className={styles.projWrap}>
           <span className={styles.projLabel}>PROJECT</span>
-          <select className={styles.projSelect}>
+          <select
+            className={styles.projSelect}
+            value={project}
+            onChange={(e) => onProjectChange(e.target.value)}
+          >
             <option>Project Alpha</option>
             <option>Project Beta</option>
             <option>Project Gamma</option>
@@ -251,6 +332,7 @@ export default function Dashboard() {
           <div className={styles.launcherTitle}>COMMAND LAUNCHER</div>
           <div className={styles.launcherSub}>PROJECT LIFECYCLE · LEFT TO RIGHT · CLICK TO FIRE</div>
           <div className={styles.launcherLegend}>
+            <span><span className={`${styles.legendChip} ${styles.chipUnused}`} />UNUSED</span>
             <span><span className={`${styles.legendChip} ${styles.chipQueued}`} />QUEUED</span>
             <span><span className={`${styles.legendChip} ${styles.chipReady}`} />READY</span>
             <span><span className={`${styles.legendChip} ${styles.chipDone}`} />DONE</span>
@@ -262,6 +344,38 @@ export default function Dashboard() {
             <button className={`${styles.gitBtn} ${styles.btnReset}`} onClick={resetSession}>↺ RESET SESSION</button>
           </div>
         </div>
+
+        <div className={styles.dialRow}>
+          <div className={styles.dialGroup}>
+            <span className={styles.dialLabel}>EFFORT</span>
+            <div className={styles.tierDial}>
+              {TIERS.map((t) => (
+                <button
+                  key={t}
+                  className={`${styles.tierBtn} ${tier === t ? styles.tierActive : ""}`}
+                  onClick={() => setTier(t)}
+                >
+                  {t.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.dialGroup}>
+            <span className={styles.dialLabel}>LEGAL RISK PROFILE</span>
+            <div className={styles.riskChips}>
+              {RISK_FLAGS.map(({ flag, label }) => (
+                <button
+                  key={flag}
+                  className={`${styles.riskChip} ${riskFlags.has(flag) ? styles.riskChipOn : ""}`}
+                  onClick={() => toggleRiskFlag(flag)}
+                >
+                  {label}{riskFlags.has(flag) ? " ✓" : ""}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className={styles.gitStatusLine}>{gitStatus}</div>
 
         <div className={styles.launcherGrid}>
@@ -272,7 +386,7 @@ export default function Dashboard() {
                 <span className={styles.cmdColNum}>{String(idx + 1).padStart(2, "0")}</span>
               </div>
               {c.items.map((item, i) => {
-                const status = getStatus(c, item, i, used);
+                const status = getStatus(c, item, i, used, tier, riskFlags);
                 return (
                 <button
                   key={item.cmd}

@@ -8,11 +8,21 @@
 // (Frontend/Backend, Security/QA/Legal, Marketing/Monetize). Capture and
 // Operate are "always available" — not really steps in the sequence.
 
+export type Tier = "simple" | "standard" | "thorough";
+export type RiskFlag = "payments" | "health" | "minors" | "eu" | "ugc";
+
 export interface Command {
   cmd: string;
   tip: string;
   prompt?: string;
   active: boolean;
+  // Minimum effort tier at which this command is in scope. Defaults to
+  // "standard" if omitted. Ignored if riskFlag is set.
+  tier?: Tier;
+  // If set, visibility is controlled entirely by the legal risk-profile
+  // checklist instead of the tier dial — in scope only when this flag is
+  // checked, regardless of tier.
+  riskFlag?: RiskFlag;
 }
 
 export interface CommandColumn {
@@ -26,6 +36,7 @@ export const commandColumns: CommandColumn[] = [
     items: [
       {
         active: true,
+        tier: "simple",
         cmd: "/brainstorm",
         tip: "You've got an idea firing. Run this when you're ready to just talk. No building, no structure — just blabber everything out. Claude catches it all.",
         prompt: `I'm going to brainstorm a new project. Here are the rules:
@@ -51,6 +62,7 @@ Ready.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/raw-drop",
         tip: "Quick capture. Drop a raw thought, a link, a voice note, anything. Don't overthink it. It goes into the vault.",
         prompt: `RAW DROP MODE.
@@ -70,6 +82,7 @@ Ready. Drop it.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/parking-lot",
         tip: "Something came up mid-session that you don't want to lose but can't deal with right now. Park it here. It gets surfaced later.",
         prompt: `PARKING LOT — capturing something I can't deal with right now.
@@ -88,6 +101,7 @@ What's getting parked:`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/remember-this",
         tip: "Flag something important that you don't want to forget. Claude will bring it back up at the start of the next relevant session automatically.",
         prompt: `FLAG FOR MEMORY.
@@ -106,6 +120,7 @@ What to remember:`,
       },
       {
         active: true,
+        tier: "simple",
         cmd: "/pivot",
         tip: "The moment you realize this project is bigger (or smaller) than you thought. Capture it now, before it becomes an expensive surprise three weeks from now.",
         prompt: `SCOPE SHIFT — something just changed about what this project actually is.
@@ -131,6 +146,7 @@ What changed:`,
     items: [
       {
         active: true,
+        tier: "simple",
         cmd: "/new-project",
         tip: "Starting something new. Sets up your GitHub folder, creates your PRD, FAQ, changelog, and parking lot files. One command, you're at 30%.",
         prompt: `Set up a new project for me. Do the following in order:
@@ -165,6 +181,7 @@ Do not ask unnecessary questions. Just build it.`,
       },
       {
         active: true,
+        tier: "simple",
         cmd: "/start-session",
         tip: "Beginning a work session. Pulls the latest code and project state from GitHub. Claude reads the state file and knows exactly where you left off. Always run this first.",
         prompt: `SESSION START. Pull everything and get us oriented.
@@ -188,6 +205,7 @@ Keep the brief tight. I'm ready to work.`,
       },
       {
         active: true,
+        tier: "simple",
         cmd: "/end-session",
         tip: "Done for now. Pushes everything to GitHub, updates the changelog, sweeps the parking lot, and leaves a breadcrumb for next session. Never skip this.",
         prompt: `We are ending this session. Do the following in order:
@@ -207,6 +225,7 @@ Do not skip any of these steps.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/github-init",
         tip: "Sets up a new GitHub repository for a project that doesn't have one yet. Run once per project.",
         prompt: `Set up GitHub for this project. It already exists locally but doesn't have a remote repo yet.
@@ -226,6 +245,7 @@ Do not ask me for my GitHub credentials — use whatever is already authenticate
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/project-state",
         tip: "Reads and summarizes the current project-state.md file. Good for getting re-oriented after time away from a project.",
         prompt: `Read the current project-state.md file and give me a re-orientation brief.
@@ -250,6 +270,7 @@ Be specific. Use dates where they exist. If the state file is outdated or missin
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/prd",
         tip: "Turns your brainstorm into a proper Product Requirements Document. The blueprint. Run this after brainstorming, before building anything.",
         prompt: `Based on everything we've brainstormed, create a full Product Requirements Document. Structure it exactly like this:
@@ -272,6 +293,7 @@ Do not add fluff. Be specific. Be honest. If something is unclear, flag it as an
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/faq",
         tip: "Generates a FAQ from your PRD. Good for clarifying assumptions and spotting gaps before you build.",
         prompt: `Read the current PRD and generate a FAQ document.
@@ -300,6 +322,7 @@ Minimum 15 questions. Don't pad it. Don't be gentle. The point is to find the ho
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/viability",
         tip: "Honest gut check on the idea. Is there a real market? Is there a moat? Can it make money? Consider following with /grill-me for a harder pressure-test.",
         prompt: `Run a viability check on this project. This is not a cheerleading exercise.
@@ -333,6 +356,7 @@ Do not soften the verdict. I'd rather know now.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/where-do-i-focus",
         tip: "Shows all your projects with rough completion percentages and one-line status. Helps you decide where your energy goes today.",
         prompt: `Look at all my active projects and give me a compass check. For each project show:
@@ -351,6 +375,7 @@ Be direct. Don't list everything as equally important. Tell me what you actually
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/what-dont-i-know",
         tip: "The most important command. Claude tells you what you're missing. Blind spots, risks, things you haven't thought of. Run this regularly. Consider following with /grill-me if the answer stings.",
         prompt: `Stop everything. Look at where we are and tell me my blind spots.
@@ -374,6 +399,7 @@ This is the most important command I run. Treat it that way.`,
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/brand-name",
         tip: "The real naming session. Not the working title — the name that invokes what this project actually is, once you know the audience and the hook. Run this after Strategy, not before.",
         prompt: `Naming session — for real this time, not a working title.
@@ -399,6 +425,7 @@ Ready when you are. Talk to me about the name.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/name-check",
         tip: "Lightweight sanity check on a name candidate — obvious collisions, domain availability. Not a legal trademark search; run /ip-check if that level of rigor matters.",
         prompt: `Sanity-check this name candidate: [NAME]
@@ -416,6 +443,7 @@ Give me a clear verdict per candidate: CLEAR, MINOR CONCERN (explain), or AVOID 
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/rebrand-check",
         tip: "Has what this project actually does or who it's for changed since we named it? Run this any time — especially right after /pivot. Consider following with /grill-me if you're attached to the current name.",
         prompt: `Rebrand check — has reality drifted from the name?
@@ -434,6 +462,7 @@ If it's not warranted: tell me clearly that the name still works and why, so I s
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/rebrand-execute",
         tip: "Once a new name is locked in, this is the checklist for actually changing it everywhere — repo, folder, hosting, database, domain. Each item is flagged by how risky it is to change.",
         prompt: `Execute the rebrand from [OLD NAME] to [NEW NAME].
@@ -466,6 +495,7 @@ Do not touch anything marked CAUTION without my explicit go-ahead. Report back w
     items: [
       {
         active: true,
+        tier: "simple",
         cmd: "/ui-brief",
         tip: "Starts the design conversation. Talk first, then Claude reflects it back and tells you what you missed. Color psychology, mood, references, trends.",
         prompt: `Design conversation — before anyone touches a design tool or writes a line of CSS.
@@ -491,6 +521,7 @@ Ready. Talk to me about how this should feel.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/design-review",
         tip: "Honest critique of the current design. No fake compliments.",
         prompt: `Review the current design. Be honest. No fake compliments.
@@ -516,6 +547,7 @@ If you can see the current design, describe what you see and critique it. If you
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/color-psych",
         tip: "Analyzes the psychological message your color choices send.",
         prompt: `Analyze the psychological message our color choices are sending.
@@ -540,6 +572,7 @@ Be direct. "The blue feels safe and corporate" is more useful than "it's a great
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/ux-audit",
         tip: "Reviews the whole user experience flow like an impatient stranger seeing it for the first time on a phone. Would they figure it out in seconds, without reading anything?",
         prompt: `Run a UX audit on this product.
@@ -580,6 +613,7 @@ VERDICT
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/component-map",
         tip: "Maps out all UI components needed before any code is written. Bridges Design into Frontend — run this right before you start building.",
         prompt: `Map out every UI component this project needs before we write a single line of code.
@@ -616,6 +650,7 @@ Note: if some UI already exists, map it as it actually is first, then note where
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/cto-brief",
         tip: "Your CTO hat. Claude recommends a stack with the cost tradeoffs spelled out — you confirm or push back, no jargon.",
         prompt: `Put on the CTO hat. Recommend how this thing should be built, and be upfront about cost.
@@ -634,6 +669,7 @@ One paragraph max per section. This is a decision brief, not a tutorial. Give me
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/tech-stack",
         tip: "Recommends the right technologies for the project. Explains each choice simply, including what's free and what costs money.",
         prompt: `Give me the full tech stack recommendation for this project.
@@ -664,6 +700,7 @@ At the bottom: flag anything in this stack that has a learning curve, a cost cli
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/file-structure",
         tip: "Sets up the folder and file structure for the project. Logical, clean, ready for Claude Code.",
         prompt: `Create the folder and file structure for this project.
@@ -683,6 +720,7 @@ Do not create the files. Just show me the plan.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/db-schema",
         tip: "Designs the database structure. What data do we store, how does it relate, what do we never store.",
         prompt: `Design the database schema for this project.
@@ -708,6 +746,7 @@ If you're missing information to make a decision, ask me one question at a time.
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/api-design",
         tip: "Maps out the API — the bridge between your frontend and backend.",
         prompt: `Design the API for this project.
@@ -738,6 +777,7 @@ Format as a clean table or grouped by feature area.`,
     items: [
       {
         active: true,
+        tier: "simple",
         cmd: "/build-ui",
         tip: "Build mode. Claude already knows your design preferences. Give it a screen and it builds it — real code, not a mockup.",
         prompt: `BUILD MODE — we're building a UI screen.
@@ -761,6 +801,7 @@ When done: tell me what props I need to pass, what state I need to manage one le
       },
       {
         active: true,
+        tier: "simple",
         cmd: "/component",
         tip: "Build a single specific UI component. Button, card, modal, form.",
         prompt: `Build a single UI component.
@@ -783,6 +824,7 @@ After the code:
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/mobile-check",
         tip: "Reviews the current UI for mobile. One hand, small screen, big enough tap targets.",
         prompt: `Run the mobile check on the current UI.
@@ -819,6 +861,7 @@ OUTPUT: List every issue found, ordered by severity. Flag the ones that would ma
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/animation",
         tip: "Adds motion to the UI. Subtle, purposeful, not flashy.",
         prompt: `Add motion to the UI. Subtle, purposeful — alive without being annoying.
@@ -847,6 +890,7 @@ Show me the code for the top 3 highest-impact animations first.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/responsive",
         tip: "Makes sure everything works across all screen sizes.",
         prompt: `Make sure this works at every screen size. No exceptions.
@@ -875,6 +919,7 @@ Fix everything that's broken. Then:
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/code-review-frontend",
         tip: "Switch to Opus or Fable before running this. A focused review of the frontend code built this session — not a UX critique, a code-quality one.",
         prompt: `Before running this: switch to Opus or Fable if you're not already on one — this review is meant to run on a stronger model than the one doing the building.
@@ -901,6 +946,7 @@ Output: a prioritized list — CRITICAL (breaks something), SHOULD FIX (real but
     items: [
       {
         active: true,
+        tier: "simple",
         cmd: "/api-build",
         tip: "Builds the actual API endpoints. The plumbing connecting frontend to data.",
         prompt: `Build the API endpoints for this project.
@@ -928,6 +974,7 @@ When done: show me how to test each endpoint with a curl command or API client e
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/db-setup",
         tip: "Sets up the database with row-level security so users only see their own data.",
         prompt: `Set up the database for this project.
@@ -953,6 +1000,7 @@ After setup:
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/auth-setup",
         tip: "Sets up user authentication.",
         prompt: `Set up authentication for this project.
@@ -981,6 +1029,7 @@ When done:
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/data-model",
         tip: "Designs how data flows through the entire app.",
         prompt: `Map out how data flows through this entire application.
@@ -1006,6 +1055,7 @@ Output as a flow diagram description or a step-by-step narrative for each major 
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/integrations",
         tip: "Connects external services — payments, email, analytics, third-party APIs. If something costs money, it gets built stubbed-off, not skipped.",
         prompt: `Set up the external service integrations for this project.
@@ -1031,6 +1081,7 @@ When done: show me how to verify each integration is working without hitting pro
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/code-review-backend",
         tip: "Switch to Opus or Fable before running this. A focused review of the backend code built this session — auth, data access, error handling.",
         prompt: `Before running this: switch to Opus or Fable if you're not already on one — this review is meant to run on a stronger model than the one doing the building.
@@ -1055,6 +1106,7 @@ Output: a prioritized list — CRITICAL (security or data-integrity issue), SHOU
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/redesign-check",
         tip: "After a long coding jam, compares what actually got built against the original design intent and flags where they drifted apart.",
         prompt: `Redesign check — has what we built drifted from what we intended?
@@ -1071,6 +1123,7 @@ Give me a clear verdict: TIGHTEN (small fixes, same direction), RETHINK (the pro
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/design-pivot",
         tip: "Not drift — growth. The product started simple and became something bigger; the screen in front of you still looks like the simple version. Time to rethink the design from scratch, not just tighten it.",
         prompt: `This isn't about whether we drifted from the plan — it's about whether the plan itself is too small now.
@@ -1099,6 +1152,7 @@ This is a bigger moment than a typical /ui-brief refresh — treat it like we're
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/design-debt",
         tip: "Audits the inconsistency that piles up from coding fast under pressure — one-off components, mismatched spacing, colors that snuck in outside the palette.",
         prompt: `Audit design debt — the small inconsistencies that accumulate from building fast.
@@ -1117,6 +1171,7 @@ Output: a prioritized cleanup list, ordered by how visible the inconsistency is 
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/consistency-pass",
         tip: "A full sweep for pattern violations across the whole built UI — the broader cleanup once design-debt has been identified.",
         prompt: `Run a full consistency pass across the entire UI.
@@ -1140,6 +1195,7 @@ Apply the fixes directly where they're small and unambiguous. Flag anything that
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/security-setup",
         tip: "Full security checklist. Rate limiting, API keys server-side, auth hardening. Non-negotiable.",
         prompt: `Run the full security setup. This is non-negotiable and happens on every project.
@@ -1183,6 +1239,7 @@ Report each item: DONE, NEEDS WORK, or N/A with reason.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/rate-limit",
         tip: "Sets up rate limiting on all endpoints — login, account creation, AI calls.",
         prompt: `Set up rate limiting across this application.
@@ -1212,6 +1269,7 @@ Show me the middleware setup and how to apply it per-route.`,
       },
       {
         active: true,
+        tier: "simple",
         cmd: "/env-audit",
         tip: "Checks that no secrets or API keys are exposed in the frontend.",
         prompt: `Audit the entire codebase for exposed secrets and environment variable leaks.
@@ -1245,6 +1303,7 @@ Fix all CRITICAL and HIGH findings before this conversation ends.`,
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/secrets-check",
         tip: "Full sweep for anything that shouldn't be public.",
         prompt: `Full secrets sweep. Find anything that shouldn't be visible.
@@ -1280,6 +1339,7 @@ OUTPUT: Everything found, severity level, and the exact fix. Nothing gets dismis
     items: [
       {
         active: true,
+        tier: "simple",
         cmd: "/qc",
         tip: "Full functional quality check before anything ships. Every button, every form, every dynamic element. For input-attack edge cases specifically, run /edge-cases.",
         prompt: `Full quality check. We are not shipping until this is clean.
@@ -1308,6 +1368,7 @@ OUTPUT: Ordered bug list. CRITICAL (blocks launch), HIGH (bad experience), MEDIU
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/edge-cases",
         tip: "What happens when things go wrong? Empty fields, huge uploads, duplicate accounts, malicious input.",
         prompt: `Edge case stress test. Assume every user is trying to break this.
@@ -1342,6 +1403,7 @@ OUTPUT: Every edge case found, expected behavior, actual behavior, and fix requi
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/cross-device",
         tip: "Test on every device type. Phone, tablet, laptop, big monitor. Different browsers.",
         prompt: `Cross-device and cross-browser test. Nothing ships until this passes.
@@ -1380,6 +1442,7 @@ OUTPUT: Matrix of what passes, what fails, and the exact fix for each failure.`,
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/pre-launch-check",
         tip: "The final checklist before anything goes live. Nothing ships without this.",
         prompt: `Pre-launch checklist. This is the last gate before we go live. Nothing ships without passing this.
@@ -1421,6 +1484,7 @@ Report: PASS / FAIL / N/A for each item. Fix all FAILs before launch.`,
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/opus-opinion",
         tip: "Switch to Opus before running this. A full, model-fresh audit of everything built so far — the deep double-check before you trust it.",
         prompt: `Before running this: switch to Opus if you're not already on it. This is meant to be a fresh, strong-model pass over work that was mostly built on a faster/cheaper model — the point is a different set of eyes, not the same reasoning run twice.
@@ -1443,6 +1507,7 @@ Be blunt. This is the "no, seriously, is this actually okay" pass — treat it t
     items: [
       {
         active: true,
+        tier: "simple",
         cmd: "/legal",
         tip: "Full legal review. Terms of service, privacy policy, compliance flags — for this specific project, not a generic checklist.",
         prompt: `Full legal review for this project. Tell me what I need before this goes anywhere near the public.
@@ -1476,6 +1541,7 @@ OUTPUT: Prioritized list of what to address before launch vs. what can wait, and
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/privacy-policy",
         tip: "Drafts the privacy policy in plain human language.",
         prompt: `Draft a Privacy Policy for this project.
@@ -1501,6 +1567,7 @@ Flag any section where you need more information from me about our actual practi
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/terms",
         tip: "Drafts the terms of service.",
         prompt: `Draft a Terms of Service for this project.
@@ -1527,6 +1594,7 @@ Flag anything specific to this product that needs special language — payments,
       },
       {
         active: true,
+        riskFlag: "minors",
         cmd: "/coppa-check",
         tip: "Children's privacy compliance. Only relevant if this project could realistically be used by, or collect data from, kids under 13 — check that first.",
         prompt: `COPPA compliance check.
@@ -1559,6 +1627,7 @@ Output: compliance status per item, what's in place, what's missing, what needs 
       },
       {
         active: true,
+        riskFlag: "eu",
         cmd: "/gdpr-review",
         tip: "European user compliance. Right to deletion, cookie consent, privacy by design.",
         prompt: `GDPR review. If we have any European users, this applies to us — no matter where we're based.
@@ -1592,6 +1661,7 @@ Output: compliant / non-compliant / needs review for each item, with specific fi
       },
       {
         active: true,
+        riskFlag: "health",
         cmd: "/hipaa-check",
         tip: "Health data compliance. Only relevant if this project touches protected health information — check that first.",
         prompt: `HIPAA compliance check.
@@ -1622,6 +1692,7 @@ Output: applies / doesn't apply, and if it applies, what's in place vs. missing,
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/ccpa-check",
         tip: "California consumer privacy rights — distinct from GDPR, different deletion/opt-out mechanics. Only relevant if we're likely to have California users at scale.",
         prompt: `CCPA (California Consumer Privacy Act) review.
@@ -1642,6 +1713,7 @@ Output: whether we're likely covered, what's in place, what's missing.`,
       },
       {
         active: true,
+        riskFlag: "payments",
         cmd: "/pci-check",
         tip: "Payment card data compliance. Usually not needed if payments go through Stripe/equivalent and card data never touches our servers — check that first.",
         prompt: `PCI DSS (payment card industry) check.
@@ -1659,6 +1731,7 @@ Output: our actual PCI scope given how we're really processing payments, and wha
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/ip-check",
         tip: "Trademark conflicts, copyright on content/assets, and open-source license obligations. More rigorous than /name-check — run this before a real public launch.",
         prompt: `Intellectual property check before launch.
@@ -1680,6 +1753,7 @@ OUTPUT: Anything found, severity, and the fix. If a genuine trademark conflict s
       },
       {
         active: true,
+        riskFlag: "ugc",
         cmd: "/dmca-policy",
         tip: "Needed the moment users can post content — comments, uploads, listings. Sets up the takedown process that protects us from liability for what they post.",
         prompt: `Set up DMCA policy and process.
@@ -1696,6 +1770,7 @@ Output: the policy document, and a clear checklist of what needs to actually be 
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/accessibility-legal",
         tip: "ADA/WCAG legal exposure — distinct from the UX-focused accessibility work in /mobile-check and /ux-audit. This is about lawsuit risk, which is real for web apps.",
         prompt: `Accessibility legal exposure check.
@@ -1715,6 +1790,7 @@ Output: a WCAG 2.1 AA gap list, prioritized by both how likely it is to trigger 
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/incorporate-check",
         tip: "LLC vs. sole prop, liability shield — legal readiness rather than compliance. Worth thinking about before real users and real money show up.",
         prompt: `Business structure check — not compliance, but legal readiness.
@@ -1736,6 +1812,7 @@ Output: a clear recommendation on timing — do this now, do this once we hit [s
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/market",
         tip: "Full CMO mode. Talk through your instincts first, then get the complete go-to-market picture. For deep Reddit targeting specifically, run /reddit-hits.",
         prompt: `Full CMO mode — build the go-to-market picture for this project.
@@ -1775,6 +1852,7 @@ Be specific. Name things. Give me something I can act on today, not a framework.
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/reddit-hits",
         tip: "Specific subreddits and existing threads where your target users are right now.",
         prompt: `Find my people on Reddit.
@@ -1807,6 +1885,7 @@ OUTPUT: A prioritized hit list. The top 3 subreddits and the exact move to make 
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/ugc-brief",
         tip: "User generated content strategy. Video formats working in your niche.",
         prompt: `Build the UGC (user generated content) strategy for this project.
@@ -1840,6 +1919,7 @@ Be specific. Write actual hook lines I can use. This should read like a creative
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/seo-play",
         tip: "The single best content piece to write for long-term organic traffic.",
         prompt: `Give me the SEO play for this project.
@@ -1873,6 +1953,7 @@ Give me one thing I can write this week. Not a strategy — a specific action.`,
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/product-hunt",
         tip: "Prepares your Product Hunt launch. Assets, timing, description, upvote strategy.",
         prompt: `Prepare the Product Hunt launch for this project.
@@ -1915,6 +1996,7 @@ Write the actual copy. Don't give me a template — give me the words.`,
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/monetize",
         tip: "CFO mode. Talk through your instincts first, then get every possible way this makes money — the obvious plays and the weird angles.",
         prompt: `CFO mode.
@@ -1952,6 +2034,7 @@ At the end: rank the top 3 by revenue potential and ease of implementation. Tell
       },
       {
         active: true,
+        tier: "simple",
         cmd: "/affiliate-map",
         tip: "Every affiliate and referral opportunity. Who pays us to send them users?",
         prompt: `Map every affiliate and referral opportunity for this project.
@@ -1988,6 +2071,7 @@ Output: ranked affiliate opportunities by revenue potential, with specific progr
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/data-play",
         tip: "What anonymized data do we have that someone would pay for? Only pursue this if the data genuinely has outside value — this command checks that first.",
         prompt: `Analyze the data play for this project.
@@ -2023,6 +2107,7 @@ Only pursue data plays that we could announce publicly without losing user trust
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/pricing",
         tip: "What should we charge? Free tier, paid tier, enterprise? Consider following with /grill-me if you're attached to a number that feels too safe.",
         prompt: `Figure out what we should charge for this product.
@@ -2058,6 +2143,7 @@ Give me the actual pricing page structure, not a framework to figure it out myse
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/revenue-model",
         tip: "Full revenue model. All streams, projections, assumptions.",
         prompt: `Build the full revenue model for this project.
@@ -2108,6 +2194,7 @@ Present the projections as a table. State every assumption clearly.`,
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/launch-check",
         tip: "Final launch checklist. Security, legal, analytics, performance. Last thing before ship.",
         prompt: `Final launch check. Nothing goes live until this is done.
@@ -2152,6 +2239,7 @@ Report every item: PASS / FAIL / N/A. Ship only when all MUST PASSes are green.`
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/app-store",
         tip: "App Store and Google Play prep — only relevant if this is actually a native/mobile app submission.",
         prompt: `Prepare this app for App Store and Google Play submission.
@@ -2193,6 +2281,7 @@ Write the actual copy. Don't give me a template to fill in.`,
       },
       {
         active: true,
+        tier: "simple",
         cmd: "/vercel-deploy",
         tip: "Deploys the current build to Vercel. Sets env vars, confirms domain, makes it live.",
         prompt: `Deploy this to Vercel. Make it live.
@@ -2227,6 +2316,7 @@ Tell me if anything fails at any step. Do not continue past a failure — stop a
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/first-post",
         tip: "Drafts the first public post announcing the project.",
         prompt: `Write the first public post announcing this project.
@@ -2259,6 +2349,7 @@ Write actual copy. Don't give me a framework.`,
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/press-pitch",
         tip: "The human story pitch for journalists. Not features — the story of why this exists.",
         prompt: `Write the press pitch for this project.
@@ -2292,6 +2383,7 @@ Write the full pitch. Then tell me who to send it to first and when.`,
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/fable-opinion",
         tip: "Switch to Fable before running this. A disciplined, slow-down final pass before shipping — catches what a fast pre-launch checklist run can miss.",
         prompt: `Before running this: switch to Fable if you're not already on it. This is meant to be a slower, more disciplined pass than the mechanical /pre-launch-check — the goal is judgment, not just checkbox completion.
@@ -2312,6 +2404,7 @@ Don't run through the mechanical checklist again — that's what /pre-launch-che
     items: [
       {
         active: true,
+        tier: "standard",
         cmd: "/test-setup",
         tip: "Scaffolds automated tests — unit and integration — for the project. Distinct from manual QA (/qc, /edge-cases), this is what runs on every future change.",
         prompt: `Set up automated testing for this project.
@@ -2331,6 +2424,7 @@ When done: tell me what's covered, what's deliberately not covered yet and why, 
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/monitoring-setup",
         tip: "What to log, what to alert on, and who gets notified when something breaks in production.",
         prompt: `Set up monitoring and alerting for this project.
@@ -2359,6 +2453,7 @@ Keep this on the free tier where possible. Tell me the setup and what I should e
       },
       {
         active: true,
+        tier: "standard",
         cmd: "/onboarding-flow",
         tip: "The first-run experience — tours, empty states, activation. The moment that decides if a new user sticks around or bounces.",
         prompt: `Design the onboarding flow for this project.
@@ -2388,6 +2483,7 @@ Output: the recommended first-run flow, step by step, and the single biggest thi
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/cost-audit",
         tip: "What's actually driving the infrastructure bill, and where does it break at scale? Run this periodically, not just once.",
         prompt: `Run a cost audit on this project's infrastructure.
@@ -2409,6 +2505,7 @@ Output: current monthly cost, projected cost at 10x scale, and the next decision
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/support-setup",
         tip: "How do users actually get help? Decide between help docs, a support inbox, or in-app chat before someone needs it.",
         prompt: `Set up how users get support for this project.
@@ -2428,6 +2525,7 @@ Keep this proportional to actual user count — don't build a full help center f
       },
       {
         active: true,
+        tier: "thorough",
         cmd: "/backup-recovery",
         tip: "Database backup strategy and what happens if a deploy breaks production. Boring until the day it saves you.",
         prompt: `Set up backup and disaster recovery for this project.

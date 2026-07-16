@@ -1,5 +1,46 @@
 # CHANGELOG
 
+## 2026-07-16 — Stage 2 complete: tier dial, risk-profile checklist, persistence
+
+Finished the three pieces deliberately deferred from the first Stage 2
+cut.
+
+- **Fifth state, Unused** (light gray, lighter than Queued) — a command
+  outside the current effort tier or an unchecked legal risk flag.
+  Still fully clickable like every other state; `done` always takes
+  priority over `unused` so completed work never un-greens itself if
+  the tier is later lowered.
+- **Effort-tier dial** — SIMPLE / STANDARD / THOROUGH segmented control
+  in the launcher header. Every command carries a `tier` (defaults to
+  `standard` if omitted); a command is in scope when its tier rank is
+  at or below the selected dial position. All 88 commands were tagged
+  by hand — e.g. `/brainstorm`, `/new-project`, `/ui-brief`, `/build-ui`,
+  `/env-audit`, `/qc` are `simple`; most Architecture/Backend/QA/Legal
+  basics are `standard`; deep-dive commands (`/color-psych`,
+  `/data-play`, `/reddit-hits`, `/opus-opinion`) are `thorough`.
+- **Legal risk-profile checklist** — five independent toggle chips
+  (Payments, Health data, Minors, EU users, UGC) that control visibility
+  for the Legal commands they map to (`/pci-check`, `/hipaa-check`,
+  `/coppa-check`, `/gdpr-review`, `/dmca-policy`) regardless of the tier
+  dial — a Simple-tier project handling payments still sees
+  `/pci-check`; a Thorough-tier project with no EU users never sees
+  `/gdpr-review`. `/ccpa-check` didn't map cleanly to any of the five
+  flags, so it stays tier-gated (`thorough`) instead.
+- **localStorage persistence, per project** — progress (`used`), tier,
+  and risk flags are saved under `core-dashboard:<project name>` and
+  reloaded whenever the project dropdown changes. Implemented as a
+  keyed remount (`<ProjectBoard key={project} .../>`) with lazy
+  `useState` initializers reading `localStorage`, not a load-effect —
+  React's hooks linter flags `setState` inside an effect as a footgun
+  (cascading renders), and the keyed-remount pattern is the
+  React-recommended fix for "state that resets when an id changes."
+- Verified live end-to-end: toggling tier/risk flags moves the right
+  buttons between unused and queued; switching to a fresh project
+  starts empty; switching back to a project with progress restores its
+  exact `used` set, tier, and risk flags — including surviving a hard
+  page reload, confirming real `localStorage` persistence and not just
+  in-memory state. Lint and build clean.
+
 ## 2026-07-16 — Stage 2 (first cut): unlock-logic state engine
 
 Replaced the flat blue/green button model with a four-state engine
