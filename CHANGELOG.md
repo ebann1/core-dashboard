@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## 2026-07-16 — Stage 2 (first cut): unlock-logic state engine
+
+Replaced the flat blue/green button model with a four-state engine
+derived entirely from the existing `used` Set — no new state, no tier
+UI yet. CRT styling throughout: black background, colored border and
+text only, no fills.
+
+- **Queued** (medium gray) — on the workflow path but waiting on a
+  prerequisite column or the previous command in its own column.
+- **Ready** (blue) — actionable now.
+- **Done** (green) — clicked this session.
+- **Backlog** (red) — an elective Marketing/Monetize command still
+  undone once `/launch-check` fires; a "you chose to defer this, look
+  at it" flag, not a punishment.
+- Capture, Redesign, and Operate are fully elective — always Ready,
+  never gated, since nothing in those columns has a real dependency.
+- All other columns unlock via a column-to-column prerequisite map
+  (Setup → Strategy → Brand → Design → Architecture → Frontend/Backend
+  → Security/QA/Legal → Launch, with Frontend and Backend both keying
+  off Architecture, and Launch requiring both Security and QA started).
+  Within an unlocked column, commands unlock top-to-bottom in the order
+  they're already listed — no extra per-command metadata needed.
+- Verified live: `/new-project` → done unlocks `/start-session` and
+  `/prd`; `/launch-check` flips still-undone `/market` from ready to
+  backlog. Lint and build clean.
+
+Deferred to a later pass: the effort-tier dial (Simple/Standard/
+Thorough) and its Unused state, the legal risk-profile checklist, and
+localStorage persistence — this was a fast, credit-constrained pass to
+get the core unlock logic live; tune from here.
+
 ## 2026-07-16 — Auth, dashboard, and command launcher
 
 - Scaffolded the project with `create-next-app` (TypeScript, Tailwind, App Router).

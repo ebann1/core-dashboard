@@ -5,6 +5,61 @@ import { commandColumns, type Command } from "@/lib/commands";
 import NeuralOrb from "@/components/NeuralOrb";
 import styles from "./dashboard.module.css";
 
+// Columns with no real dependency — always actionable, never queued.
+const ELECTIVE_COLUMNS = new Set(["Capture", "Redesign", "Operate"]);
+// Elective columns that flip to backlog if still undone once /launch-check fires.
+const BACKLOG_ELIGIBLE_COLUMNS = new Set(["Marketing", "Monetize"]);
+// Column -> prerequisite column(s). Column unlocks once ANY prerequisite's
+// first command is done (Launch is the one AND-gate, handled separately).
+const COLUMN_PREREQ: Record<string, string[]> = {
+  Strategy: ["Setup"],
+  Brand: ["Strategy"],
+  Design: ["Brand"],
+  Architecture: ["Design"],
+  Frontend: ["Architecture"],
+  Backend: ["Architecture"],
+  Security: ["Frontend", "Backend"],
+  QA: ["Frontend", "Backend"],
+  Legal: ["Frontend", "Backend"],
+};
+
+type Status = "queued" | "ready" | "done" | "backlog";
+
+function firstItemDone(colName: string, used: Set<string>): boolean {
+  const col = commandColumns.find((c) => c.col === colName);
+  const first = col?.items[0];
+  return !!first && used.has(first.cmd);
+}
+
+function getStatus(
+  col: { col: string; items: Command[] },
+  item: Command,
+  indexInCol: number,
+  used: Set<string>
+): Status {
+  if (used.has(item.cmd)) return "done";
+
+  if (ELECTIVE_COLUMNS.has(col.col)) return "ready";
+
+  if (BACKLOG_ELIGIBLE_COLUMNS.has(col.col)) {
+    return used.has("/launch-check") ? "backlog" : "ready";
+  }
+
+  let colUnlocked: boolean;
+  if (col.col === "Setup") {
+    colUnlocked = true;
+  } else if (col.col === "Launch") {
+    colUnlocked = firstItemDone("Security", used) && firstItemDone("QA", used);
+  } else {
+    const prereqs = COLUMN_PREREQ[col.col];
+    colUnlocked = prereqs ? prereqs.some((p) => firstItemDone(p, used)) : true;
+  }
+
+  if (!colUnlocked) return "queued";
+  if (indexInCol === 0) return "ready";
+  return used.has(col.items[indexInCol - 1].cmd) ? "ready" : "queued";
+}
+
 export default function Dashboard() {
   const [clock, setClock] = useState("--:--:--");
   const [clockDate, setClockDate] = useState("— — —");
@@ -196,8 +251,10 @@ export default function Dashboard() {
           <div className={styles.launcherTitle}>COMMAND LAUNCHER</div>
           <div className={styles.launcherSub}>PROJECT LIFECYCLE · LEFT TO RIGHT · CLICK TO FIRE</div>
           <div className={styles.launcherLegend}>
-            <span><span className={`${styles.legendChip} ${styles.chipDone}`} />RUN THIS SESSION</span>
-            <span><span className={`${styles.legendChip} ${styles.chipTodo}`} />NOT YET RUN</span>
+            <span><span className={`${styles.legendChip} ${styles.chipQueued}`} />QUEUED</span>
+            <span><span className={`${styles.legendChip} ${styles.chipReady}`} />READY</span>
+            <span><span className={`${styles.legendChip} ${styles.chipDone}`} />DONE</span>
+            <span><span className={`${styles.legendChip} ${styles.chipBacklog}`} />BACKLOG</span>
           </div>
           <div className={styles.gitBtns}>
             <button className={`${styles.gitBtn} ${styles.btnPull}`} onClick={doPull}>⇣ PULL</button>
@@ -214,14 +271,15 @@ export default function Dashboard() {
                 <span>{c.col}</span>
                 <span className={styles.cmdColNum}>{String(idx + 1).padStart(2, "0")}</span>
               </div>
-              {c.items.map((item) => (
+              {c.items.map((item, i) => {
+                const status = getStatus(c, item, i, used);
+                return (
                 <button
                   key={item.cmd}
                   className={[
                     styles.cmdBtn,
-                    !item.active ? styles.cmdInactive : "",
-                    item.active && used.has(item.cmd) ? styles.cmdDone : "",
-                    item.active && flashing.has(item.cmd) ? styles.cmdFlash : "",
+                    styles[`cmd${status.charAt(0).toUpperCase()}${status.slice(1)}`],
+                    flashing.has(item.cmd) ? styles.cmdFlash : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -234,9 +292,10 @@ export default function Dashboard() {
                   }
                   onMouseLeave={() => setTooltip(null)}
                 >
-                  {item.cmd}
+                  {status === "done" ? "✓ " : ""}{item.cmd}
                 </button>
-              ))}
+                );
+              })}
             </div>
           ))}
         </div>
