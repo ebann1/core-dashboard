@@ -80,12 +80,9 @@ export default function Dashboard() {
         <div className={styles.projWrap}>
           <span className={styles.projLabel}>PROJECT</span>
           <select className={styles.projSelect}>
-            <option>Baby Buddy / Keeper</option>
-            <option>Jet Flight Planner</option>
-            <option>Fancy Finder</option>
-            <option>Neighborhood Heat Map</option>
-            <option>Skills-to-Niche Scanner</option>
-            <option>Anxiety Loop App</option>
+            <option>Project Alpha</option>
+            <option>Project Beta</option>
+            <option>Project Gamma</option>
           </select>
         </div>
         <div className={styles.topStatus}>
@@ -126,9 +123,9 @@ export default function Dashboard() {
           <div className={styles.secLabel}>Context Windows</div>
           {[
             { name: "Main Thread", pct: 71, cls: styles.fYellow, col: "#d4a017" },
-            { name: "CTO · Keeper", pct: 28, cls: styles.fGreen, col: "#2ec96a" },
-            { name: "CFO · Keeper", pct: 14, cls: styles.fGreen, col: "#2ec96a" },
-            { name: "Jet Planner", pct: 84, cls: styles.fOrange, col: "#d4601a" },
+            { name: "CTO · Alpha", pct: 28, cls: styles.fGreen, col: "#2ec96a" },
+            { name: "CFO · Alpha", pct: 14, cls: styles.fGreen, col: "#2ec96a" },
+            { name: "Beta", pct: 84, cls: styles.fOrange, col: "#d4601a" },
           ].map((c) => (
             <div className={styles.ctxRow} key={c.name}>
               <span className={styles.ctxName}>{c.name}</span>
@@ -151,7 +148,7 @@ export default function Dashboard() {
           </div>
           <div className={styles.orbCaption}>NEURAL MESH · ACTIVE</div>
           <div className={styles.centerProject}>
-            <b>BABY BUDDY / KEEPER</b> · <b className={styles.amber}>DESIGN PHASE</b> · <b>30% COMPLETE</b>
+            <b>PROJECT ALPHA</b> · <b className={styles.amber}>DESIGN PHASE</b> · <b>30% COMPLETE</b>
           </div>
         </div>
 
@@ -159,11 +156,11 @@ export default function Dashboard() {
         <div className={`${styles.panel} ${styles.right}`}>
           <div className={styles.secLabel}>Action Items</div>
           <div className={styles.remember}>
-            ◈ REMEMBER — important button idea for Baby Buddy main screen. Never came back to this.
+            ◈ REMEMBER — important UI idea for the Alpha main screen. Never came back to this.
             <div className={styles.t}>FLAGGED · JUL 6</div>
           </div>
           <div className={`${styles.alert} ${styles.aCrit}`}>
-            Jet Planner context at 84% — summarize &amp; reset before next session.
+            Beta context at 84% — summarize &amp; reset before next session.
             <div className={styles.t}>CONTEXT · CRITICAL</div>
           </div>
           <div className={`${styles.alert} ${styles.aWarn}`}>
@@ -171,7 +168,7 @@ export default function Dashboard() {
             <div className={styles.t}>CONTEXT · WATCH</div>
           </div>
           <div className={`${styles.alert} ${styles.aWarn}`}>
-            Baby Buddy — COPPA legal checkpoint not yet run. Required after PRD.
+            Alpha — Legal checkpoint not yet run. Required after PRD.
             <div className={styles.t}>LEGAL FLAG</div>
           </div>
 

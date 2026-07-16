@@ -1,6 +1,12 @@
 // C.O.R.E. Command Launcher data
+// Stage 1 of the workflow reorganization — see PLANNING.md for the full brief.
 // active: true = real prompt exists, button is blue and functional
 // active: false = not yet written, button is dark gray, not clickable
+//
+// Column order is a left-to-right workflow: sequential where order genuinely
+// matters, parallel where columns are meant to be worked side by side
+// (Frontend/Backend, Security/QA/Legal, Marketing/Monetize). Capture and
+// Operate are "always available" — not really steps in the sequence.
 
 export interface Command {
   cmd: string;
@@ -98,6 +104,26 @@ This gets surfaced at the start of every future session on this project until I 
 
 What to remember:`,
       },
+      {
+        active: true,
+        cmd: "/pivot",
+        tip: "The moment you realize this project is bigger (or smaller) than you thought. Capture it now, before it becomes an expensive surprise three weeks from now.",
+        prompt: `SCOPE SHIFT — something just changed about what this project actually is.
+
+I'm feeling that jolt where the project I thought I was building isn't quite what this is anymore — it got bigger, more serious, more specific, or fundamentally different in who it's for or what it does.
+
+Do the following:
+1. Listen to what changed and what triggered the realization
+2. Restate the shift in one sentence: "This went from [old framing] to [new framing]"
+3. Log it in project-state.md under a new "Pivots" section with today's date
+4. Tell me honestly: does this pivot mean the current name still fits, or is it worth running /rebrand-check?
+5. Tell me honestly: does this pivot mean the current design direction still fits, or is it worth running /redesign-check?
+6. If the pivot is big enough, flag that it may be worth revisiting /viability and /prd with the new framing
+
+Do not solve anything yet. Just capture the shift and tell me what it should trigger.
+
+What changed:`,
+      },
     ],
   },
   {
@@ -109,7 +135,7 @@ What to remember:`,
         tip: "Starting something new. Sets up your GitHub folder, creates your PRD, FAQ, changelog, and parking lot files. One command, you're at 30%.",
         prompt: `Set up a new project for me. Do the following in order:
 
-1. Ask me for the project name if I haven't given it
+1. Ask me for the project name if I haven't given it — treat it as a working title, not final. Naming for real happens later, in the Brand phase, once we know the audience and the emotional hook.
 2. Create a new folder locally named after the project
 3. Initialize a Git repository inside it
 4. Create a GitHub repository and push the initial commit
@@ -133,6 +159,7 @@ project-state.md template:
 ## Last session summary
 ## Parking lot
 ## Remember these
+## Pivots
 
 Do not ask unnecessary questions. Just build it.`,
       },
@@ -148,6 +175,7 @@ Do the following in order:
 3. Read the last 5 entries in CHANGELOG.md
 4. Read parking-lot.md — flag anything that's been sitting there more than 7 days
 5. Read the "Remember these" section — surface anything flagged that we haven't resolved yet
+6. Check for any working code that isn't reflected in project-state.md — if a prototype exists that the state file doesn't mention, flag that first
 
 Then give me a session brief:
 - Current project status in one sentence
@@ -187,7 +215,7 @@ Do the following:
 1. Confirm the local project folder name
 2. Create a new GitHub repository — same name as the folder, private by default
 3. Add the remote origin
-4. Create a .gitignore appropriate for this stack (Next.js / Node / whatever applies)
+4. Create a .gitignore appropriate for this stack
 5. Make the initial commit with all current files
 6. Push to main
 7. Confirm the repo URL and that everything is live
@@ -211,6 +239,7 @@ Give me:
 - What was in progress when we last left off
 - Top open questions that need an answer before we can move
 - Anything in the parking lot or remember list that I need to act on
+- Any pivots logged, and whether they were ever resolved
 
 Be specific. Use dates where they exist. If the state file is outdated or missing information, tell me — don't fill in gaps with guesses.`,
       },
@@ -272,7 +301,7 @@ Minimum 15 questions. Don't pad it. Don't be gentle. The point is to find the ho
       {
         active: true,
         cmd: "/viability",
-        tip: "Honest gut check on the idea. Is there a real market? Is there a moat? Can it make money?",
+        tip: "Honest gut check on the idea. Is there a real market? Is there a moat? Can it make money? Consider following with /grill-me for a harder pressure-test.",
         prompt: `Run a viability check on this project. This is not a cheerleading exercise.
 
 I want an honest answer to: should this exist, and can it make money?
@@ -323,7 +352,7 @@ Be direct. Don't list everything as equally important. Tell me what you actually
       {
         active: true,
         cmd: "/what-dont-i-know",
-        tip: "The most important command. Claude tells you what you're missing. Blind spots, risks, things you haven't thought of. Run this regularly.",
+        tip: "The most important command. Claude tells you what you're missing. Blind spots, risks, things you haven't thought of. Run this regularly. Consider following with /grill-me if the answer stings.",
         prompt: `Stop everything. Look at where we are and tell me my blind spots.
 
 I want to know:
@@ -341,39 +370,278 @@ This is the most important command I run. Treat it that way.`,
     ],
   },
   {
+    col: "Brand",
+    items: [
+      {
+        active: true,
+        cmd: "/brand-name",
+        tip: "The real naming session. Not the working title — the name that invokes what this project actually is, once you know the audience and the hook. Run this after Strategy, not before.",
+        prompt: `Naming session — for real this time, not a working title.
+
+First, check: do we actually know who this is for and what the emotional hook is? If Strategy (PRD, viability) isn't settled yet, tell me to go finish that first — a name chosen before the project is understood is exactly how working titles turn into awkward mid-project rebrands.
+
+If we're ready, here's how this works:
+
+ROUND 1 — you talk
+Just throw out names, feelings, words, anything that comes to mind about what this project should be called. No filtering. I'll catch it all.
+
+ROUND 2 — I reflect back
+I'll organize what you gave me: which names are on-the-nose, which are clever, which accidentally undersell what this has become, and which ones actually capture the real emotional hook we identified in Strategy.
+
+ROUND 3 — by the way
+I'll tell you what you didn't consider: names that are too close to competitors, names that lock you into a narrower niche than the product has grown into, and the difference between a name that's cute now and a name that still works if this becomes a real business.
+
+Then: 8-10 candidate names, each with a one-line read on what it communicates and who it appeals to.
+
+It does not need to be a novel, unclaimed word — it needs to not obviously collide with an established brand in the same space. Run /name-check on your favorites once we've narrowed it down.
+
+Ready when you are. Talk to me about the name.`,
+      },
+      {
+        active: true,
+        cmd: "/name-check",
+        tip: "Lightweight sanity check on a name candidate — obvious collisions, domain availability. Not a legal trademark search; run /ip-check if that level of rigor matters.",
+        prompt: `Sanity-check this name candidate: [NAME]
+
+This is a lightweight pass, not a legal trademark search — if this project is serious enough to need that level of certainty, tell me and I'll flag /ip-check instead.
+
+Check:
+- Does this obviously collide with an established, well-known brand in the same or an adjacent space?
+- Is the .com (or the TLD that matters for this project) available, or close to it?
+- Is a reasonable social handle available on the platforms this project will actually use?
+- Does it accidentally mean something bad in a language we might have users in?
+- Is it easy to say out loud, spell from hearing it, and remember?
+
+Give me a clear verdict per candidate: CLEAR, MINOR CONCERN (explain), or AVOID (explain why). Don't manufacture concerns — a name being close to a small, unrelated company in a different space is not a real problem.`,
+      },
+      {
+        active: true,
+        cmd: "/rebrand-check",
+        tip: "Has what this project actually does or who it's for changed since we named it? Run this any time — especially right after /pivot. Consider following with /grill-me if you're attached to the current name.",
+        prompt: `Rebrand check — has reality drifted from the name?
+
+Look at the current name against what this project actually is today: the audience, the emotional hook, the scope. Be honest about whether they still match.
+
+Tell me:
+- What the current name communicates, taken at face value
+- What the project actually is now
+- Whether those two things still line up, or whether the name is undersizing, oversizing, or just misdescribing what this has become
+- If they don't match: is this a real rebrand situation, or is the name still fine and I'm just second-guessing it?
+
+If a rebrand is genuinely warranted, run /brand-name again with the current, real framing of the project — then /rebrand-execute once a new name is locked in.
+
+If it's not warranted: tell me clearly that the name still works and why, so I stop relitigating it.`,
+      },
+      {
+        active: true,
+        cmd: "/rebrand-execute",
+        tip: "Once a new name is locked in, this is the checklist for actually changing it everywhere — repo, folder, hosting, database, domain. Each item is flagged by how risky it is to change.",
+        prompt: `Execute the rebrand from [OLD NAME] to [NEW NAME].
+
+Work through this checklist. For each item, tell me if it's SAFE (low-risk, do it), CAUTION (has a real consequence, confirm with me first), or SKIP (not worth touching right now).
+
+REPO & CODE
+- Rename the GitHub repository — note: old clone URLs will redirect, but anyone with the old URL bookmarked should be told
+- Rename the local project folder
+- Update the project name in package.json, README, and any in-app branding strings
+
+HOSTING & INFRA
+- Rename the Vercel (or equivalent) project — generally safe, internal name only
+- Rename the Supabase (or equivalent) database project — generally safe, internal name only
+- Update any environment variable names that reference the old project name
+
+DOMAIN
+- If there's a live custom domain: this is the real risk. Walk me through what changes, what breaks temporarily, and how to minimize downtime — don't just say "update DNS"
+- If no live domain yet: just confirm the new domain is available and set it up fresh
+
+DOCS
+- Update CHANGELOG.md, project-state.md, and PRD.md to reflect the new name (keep the old name mentioned once for history, don't erase it)
+
+Do not touch anything marked CAUTION without my explicit go-ahead. Report back what changed and what's still pending.`,
+      },
+    ],
+  },
+  {
+    col: "Design",
+    items: [
+      {
+        active: true,
+        cmd: "/ui-brief",
+        tip: "Starts the design conversation. Talk first, then Claude reflects it back and tells you what you missed. Color psychology, mood, references, trends.",
+        prompt: `Design conversation — before anyone touches a design tool or writes a line of CSS.
+
+ROUND 1 — you talk
+Tell me every idea you have for how this should look and feel. No filtering, no structure, just say it — references, colors, moods, apps you love, apps you hate.
+
+ROUND 2 — I reflect back
+I'll organize what you gave me:
+- Personality: if this app were a person, 3 adjectives max
+- Visual direction: the references you gave me and what specifically works about each
+- Color & type: the mood and intent behind what you described
+- Which of your instincts are obvious/standard vs. which are genuinely sharp choices
+
+ROUND 3 — by the way
+I'll flag what you didn't mention that matters: dark mode, accessibility/contrast, how this holds up on mobile, whether your direction fights or matches the emotional hook from Strategy, and what a direct competitor already owns visually that we should avoid stepping on.
+
+Then: one design principle sentence — the single idea every design decision gets measured against from here on.
+
+Note: if a prototype already exists, describe what's already built and I'll reconcile the direction against it rather than pretending we're starting from nothing.
+
+Ready. Talk to me about how this should feel.`,
+      },
+      {
+        active: true,
+        cmd: "/design-review",
+        tip: "Honest critique of the current design. No fake compliments.",
+        prompt: `Review the current design. Be honest. No fake compliments.
+
+I need you to look at what we have and tell me what's working and what's not. I'd rather hear it from you now than from users after launch.
+
+Cover:
+- First impression — what does this communicate in the first 3 seconds?
+- Visual hierarchy — does the eye go where it's supposed to go?
+- Consistency — are we using the same patterns, spacing, type sizes throughout?
+- Color — is it working for us or against us?
+- Typography — readable? Appropriate weight and contrast?
+- Whitespace — cramped, or balanced?
+- Mobile — does this hold up on a small screen?
+- Anything that looks dated, generic, or template-y?
+
+Then:
+- Top 3 things to fix immediately
+- One thing that's actually working well (if anything)
+- The single change that would have the biggest visual impact
+
+If you can see the current design, describe what you see and critique it. If you can't, tell me what to share.`,
+      },
+      {
+        active: true,
+        cmd: "/color-psych",
+        tip: "Analyzes the psychological message your color choices send.",
+        prompt: `Analyze the psychological message our color choices are sending.
+
+Colors communicate before words do. Tell me if ours are saying the right thing.
+
+Cover:
+- What is each color in our palette communicating psychologically?
+- What's the combined emotional signal of the palette as a whole?
+- Does that signal match what we want users to feel?
+- What demographic responds well to this palette — and who might be turned off?
+- Are there any colors in conflict with each other (trust vs. urgency, calm vs. excitement)?
+- How does our palette perform in dark mode? In bright sunlight on a phone?
+- How does it hold up for colorblind users?
+
+Then give me:
+- A one-sentence read on what our palette currently says
+- Whether it's right or wrong for this product
+- If wrong: the specific adjustment — don't redesign everything, tell me the one change that fixes the signal
+
+Be direct. "The blue feels safe and corporate" is more useful than "it's a great choice."`,
+      },
+      {
+        active: true,
+        cmd: "/ux-audit",
+        tip: "Reviews the whole user experience flow like an impatient stranger seeing it for the first time on a phone. Would they figure it out in seconds, without reading anything?",
+        prompt: `Run a UX audit on this product.
+
+The standard: a distracted, impatient stranger opens this on a phone for the first time, with no instructions and no patience. Would they figure out what to do in a few seconds, without reading anything?
+
+Walk me through:
+
+FIRST-USE FLOW
+- What happens the first time someone opens this?
+- Is the value proposition clear before they scroll?
+- How many steps to their first "win" — the moment they get something useful?
+
+NAVIGATION
+- Can someone find what they need without thinking about it?
+- Are there dead ends? Confusing labels? Hidden features?
+- Is the back button always predictable?
+
+FRICTION POINTS
+- Where will users get confused, give up, or make mistakes?
+- Are we asking for too much too soon (email before value, permissions before trust)?
+- Any forms that are longer than they need to be?
+
+MOBILE REALITY CHECK
+- Tap targets big enough? (44px minimum)
+- Anything that requires precision on a small screen?
+- Loading states and empty states — do they exist and are they helpful?
+
+RECOVERY
+- If they make a mistake, can they fix it easily?
+- Are there any destructive actions with no undo?
+- If they close the app and come back, do they lose their progress?
+
+VERDICT
+- Top 3 UX problems to fix before this touches a real user
+- The one flow that needs a full rethink vs. just a tweak
+- Would this user come back and use it again, or bounce and never return?`,
+      },
+      {
+        active: true,
+        cmd: "/component-map",
+        tip: "Maps out all UI components needed before any code is written. Bridges Design into Frontend — run this right before you start building.",
+        prompt: `Map out every UI component this project needs before we write a single line of code.
+
+Think through every screen and interaction and identify every reusable piece.
+
+For each component:
+- Component name (PascalCase)
+- What it does in one sentence
+- Where it's used (which screens/contexts)
+- Key props or states it needs to handle
+- Any variants (e.g. Button: primary, secondary, destructive, loading, disabled)
+
+Group them by category:
+- Layout components (shells, containers, grids)
+- Navigation components (nav bars, tabs, breadcrumbs)
+- Data display components (cards, tables, lists, badges)
+- Form components (inputs, selects, toggles, date pickers)
+- Feedback components (toasts, modals, alerts, loading states)
+- Empty states and error states
+- Page-specific components (not reusable — list separately)
+
+At the end:
+- Which components should we build first (shared dependencies)?
+- Any components complex enough to need their own design spec before building?
+- Anything we should pull from a component library vs. build from scratch?
+
+Note: if some UI already exists, map it as it actually is first, then note where it diverges from what the design brief called for.`,
+      },
+    ],
+  },
+  {
     col: "Architecture",
     items: [
       {
         active: true,
         cmd: "/cto-brief",
-        tip: "Your CTO hat. What should this be built with and why? Stack recommendations in plain language.",
-        prompt: `Put on the CTO hat. Tell me how this thing should be built and why.
+        tip: "Your CTO hat. Claude recommends a stack with the cost tradeoffs spelled out — you confirm or push back, no jargon.",
+        prompt: `Put on the CTO hat. Recommend how this thing should be built, and be upfront about cost.
 
-I'm not an engineer. I don't want jargon. I want the decision explained like you're talking to a smart founder who just needs to understand the tradeoffs.
+I'm not an engineer. I don't want jargon. Give me a clear recommendation, the reasoning, and the tradeoff — then I'll confirm or push back, this isn't a full brainstorm.
 
 Cover:
-- What's the recommended full stack and why
-- Frontend framework and why (not just "it's popular")
-- Backend approach — serverless, traditional, BaaS — and why this project specifically
-- Database recommendation and why
-- Auth solution recommendation
-- Hosting and deployment recommendation
-- What we should NOT use, and why (be specific about what fails at scale or creates problems)
+- The recommended stack and why, specifically for this project (not just "it's popular")
+- Frontend framework, backend approach, database, auth, hosting — one recommendation each, with the alternative you considered and rejected
+- Default to free-tier options everywhere possible. If something genuinely needs a paid tier or a commercial license, say so clearly and tell me the cost — we build toward it, we don't skip it, but we don't pay for it before we have a reason to
+- What we should NOT use, and why
 - The single biggest architectural decision we need to make before writing any code
-- What a senior engineer would do differently from a junior engineer on this project
+- If a prototype already exists, evaluate what's already there rather than proposing a clean-slate stack that ignores it
 
-One paragraph max per section. No fluff. This is a decision brief, not a tutorial.`,
+One paragraph max per section. This is a decision brief, not a tutorial. Give me your recommendation — I'll tell you if something feels wrong.`,
       },
       {
         active: true,
         cmd: "/tech-stack",
-        tip: "Recommends the right technologies for the project. Explains each choice simply.",
+        tip: "Recommends the right technologies for the project. Explains each choice simply, including what's free and what costs money.",
         prompt: `Give me the full tech stack recommendation for this project.
 
 Format it as a clean decision table:
 
-| Layer | Recommendation | Why | Alternative considered |
-|-------|---------------|-----|----------------------|
+| Layer | Recommendation | Why | Free tier or paid? | Alternative considered |
+|-------|---------------|-----|---------------------|-------------------------|
 
 Cover every layer:
 - Frontend framework
@@ -390,9 +658,9 @@ Cover every layer:
 - Hosting / deployment
 - CI/CD
 
-For each choice: one sentence on why this one, one sentence on what we're trading away.
+For each choice: one sentence on why this one, one sentence on what we're trading away, and whether it's free to start or has a cost cliff.
 
-At the bottom: flag anything in this stack that has a learning curve, a cost cliff, or a known gotcha I should know about before we commit.`,
+At the bottom: flag anything in this stack that has a learning curve, a cost cliff, or a known gotcha I should know about before we commit. If something requires payment, note it but don't drop it from the plan — we build toward it and turn it on once there's revenue to justify it.`,
       },
       {
         active: true,
@@ -407,15 +675,7 @@ Rules:
 - Include a one-line comment next to each folder explaining what lives there
 - Flag any files that need to be created on day one vs. day two
 
-Output the full structure as a tree, like this:
-\`\`\`
-project-name/
-├── app/                    # Next.js app router pages
-│   ├── (auth)/            # Auth-protected routes
-│   └── api/               # API route handlers
-├── components/             # Reusable UI components
-...
-\`\`\`
+Output the full structure as a tree with a one-line comment per folder explaining what lives there.
 
 After the tree, list the 5 most important files to create first and in what order.
 
@@ -474,166 +734,15 @@ Format as a clean table or grouped by feature area.`,
     ],
   },
   {
-    col: "Design",
-    items: [
-      {
-        active: true,
-        cmd: "/ui-brief",
-        tip: "Starts the design conversation. Color psychology, mood, references, trends.",
-        prompt: `Start the design conversation for this project.
-
-I want to figure out what this thing should look and feel like before anyone touches Figma or writes a line of CSS.
-
-Walk me through:
-
-PERSONALITY
-- If this app were a person, how would you describe them? (3 adjectives max)
-- What feeling should someone have 10 seconds after opening it?
-- What's the one emotion we want to trigger and sustain?
-
-VISUAL DIRECTION
-- What are 3 reference apps or sites that get the vibe right — and what specifically works about them?
-- What's the design trend we should lean into and why?
-- What's the design trend we should actively avoid and why?
-
-COLOR & TYPE
-- Color palette direction — not hex codes yet, just the mood and intent
-- Typography personality — is this serious, playful, premium, utilitarian?
-
-WHAT WE ARE NOT
-- Name two design directions that would be wrong for this product and explain why
-
-At the end: give me one design principle sentence — the single idea that every design decision should be measured against.`,
-      },
-      {
-        active: true,
-        cmd: "/design-review",
-        tip: "Honest critique of the current design. No fake compliments.",
-        prompt: `Review the current design. Be honest. No fake compliments.
-
-I need you to look at what we have and tell me what's working and what's not. I'd rather hear it from you now than from users after launch.
-
-Cover:
-- First impression — what does this communicate in the first 3 seconds?
-- Visual hierarchy — does the eye go where it's supposed to go?
-- Consistency — are we using the same patterns, spacing, type sizes throughout?
-- Color — is it working for us or against us?
-- Typography — readable? Appropriate weight and contrast?
-- Whitespace — cramped, or balanced?
-- Mobile — does this hold up on a small screen?
-- Anything that looks dated, generic, or template-y?
-
-Then:
-- Top 3 things to fix immediately
-- One thing that's actually working well (if anything)
-- The single change that would have the biggest visual impact
-
-If you can see the current design, describe what you see and critique it. If you can't, tell me what to share.`,
-      },
-      {
-        active: true,
-        cmd: "/color-psych",
-        tip: "Analyzes the psychological message your color choices send.",
-        prompt: `Analyze the psychological message our color choices are sending.
-
-Colors communicate before words do. Tell me if ours are saying the right thing.
-
-Cover:
-- What is each color in our palette communicating psychologically?
-- What's the combined emotional signal of the palette as a whole?
-- Does that signal match what we want users to feel?
-- What demographic responds well to this palette — and who might be turned off?
-- Are there any colors in conflict with each other (trust vs. urgency, calm vs. excitement)?
-- How does our palette perform in dark mode? In bright sunlight on a phone?
-- How does it hold up for colorblind users?
-
-Then give me:
-- A one-sentence read on what our palette currently says
-- Whether it's right or wrong for this product
-- If wrong: the specific adjustment — don't redesign everything, tell me the one change that fixes the signal
-
-Be direct. "The blue feels safe and corporate" is more useful than "it's a great choice."`,
-      },
-      {
-        active: true,
-        cmd: "/ux-audit",
-        tip: "Reviews the user experience flow. Would a sleep-deprived parent figure it out in 3 seconds?",
-        prompt: `Run a UX audit on this product.
-
-The standard I use: would a sleep-deprived parent holding a baby at 3am figure this out in under 3 seconds on a phone, without reading anything?
-
-Walk me through:
-
-FIRST-USE FLOW
-- What happens the first time someone opens this?
-- Is the value proposition clear before they scroll?
-- How many steps to their first "win" — the moment they get something useful?
-
-NAVIGATION
-- Can someone find what they need without thinking about it?
-- Are there dead ends? Confusing labels? Hidden features?
-- Is the back button always predictable?
-
-FRICTION POINTS
-- Where will users get confused, give up, or make mistakes?
-- Are we asking for too much too soon (email before value, permissions before trust)?
-- Any forms that are longer than they need to be?
-
-MOBILE REALITY CHECK
-- Tap targets big enough? (44px minimum)
-- Anything that requires precision on a small screen?
-- Loading states and empty states — do they exist and are they helpful?
-
-VERDICT
-- Top 3 UX problems to fix before this touches a real user
-- The one flow that needs a full rethink vs. just a tweak`,
-      },
-      {
-        active: true,
-        cmd: "/component-map",
-        tip: "Maps out all UI components needed before any code is written.",
-        prompt: `Map out every UI component this project needs before we write a single line of code.
-
-Think through every screen and interaction and identify every reusable piece.
-
-For each component:
-- Component name (PascalCase)
-- What it does in one sentence
-- Where it's used (which screens/contexts)
-- Key props or states it needs to handle
-- Any variants (e.g. Button: primary, secondary, destructive, loading, disabled)
-
-Group them by category:
-- Layout components (shells, containers, grids)
-- Navigation components (nav bars, tabs, breadcrumbs)
-- Data display components (cards, tables, lists, badges)
-- Form components (inputs, selects, toggles, date pickers)
-- Feedback components (toasts, modals, alerts, loading states)
-- Empty states and error states
-- Page-specific components (not reusable — list separately)
-
-At the end:
-- Which components should we build first (shared dependencies)?
-- Any components complex enough to need their own design spec before building?
-- Anything we should pull from a component library vs. build from scratch?`,
-      },
-    ],
-  },
-  {
     col: "Frontend",
     items: [
       {
         active: true,
         cmd: "/build-ui",
-        tip: "Build mode. Claude already knows your design preferences. Give it a screen and it builds it.",
+        tip: "Build mode. Claude already knows your design preferences. Give it a screen and it builds it — real code, not a mockup.",
         prompt: `BUILD MODE — we're building a UI screen.
 
-My design preferences you should already know:
-- Modern retro aesthetic where relevant — clean, purposeful, alive
-- Typography: functional and readable, not decorative
-- Whitespace: generous
-- Motion: subtle and intentional, never gratuitous
-- Mobile: always considered, never an afterthought
+I recommend building it consistent with the design direction and component map we've already established. Tell me if that's wrong before I start, otherwise I'll proceed.
 
 Tell me which screen or view we're building if I haven't specified it.
 
@@ -646,6 +755,7 @@ Standards:
 - Accessible: semantic HTML, proper ARIA where needed
 - TypeScript types if we're using TypeScript
 - Wire up to real data shapes even if data is mocked for now
+- If a prototype already exists, build on it and reconcile rather than starting a competing version
 
 When done: tell me what props I need to pass, what state I need to manage one level up, and what's hardcoded that needs to become dynamic later.`,
       },
@@ -729,7 +839,7 @@ For each animation:
 - What does it communicate to the user?
 
 Implementation:
-- Use CSS transitions and Framer Motion where appropriate for our stack
+- Use CSS transitions and a motion library where appropriate for our stack
 - Respect prefers-reduced-motion — every animation needs a no-motion fallback
 - No animation that delays the user from getting to content
 
@@ -742,10 +852,10 @@ Show me the code for the top 3 highest-impact animations first.`,
         prompt: `Make sure this works at every screen size. No exceptions.
 
 Run through every major breakpoint:
-- 375px — iPhone SE, smallest common phone
-- 390px — iPhone 14/15 standard
-- 768px — iPad portrait / large phone landscape
-- 1024px — iPad landscape / small laptop
+- 375px — smallest common phone
+- 390px — standard modern phone
+- 768px — tablet portrait / large phone landscape
+- 1024px — tablet landscape / small laptop
 - 1280px — standard laptop
 - 1440px — large laptop / external monitor
 - 1920px+ — desktop monitor and beyond
@@ -762,6 +872,27 @@ Fix everything that's broken. Then:
 - Show me the responsive CSS/Tailwind changes made
 - Flag anything that needed a fundamentally different layout at a breakpoint (not just a tweak)
 - Confirm we're not using any fixed pixel widths that will break at unexpected sizes`,
+      },
+      {
+        active: true,
+        cmd: "/code-review-frontend",
+        tip: "Switch to Opus or Fable before running this. A focused review of the frontend code built this session — not a UX critique, a code-quality one.",
+        prompt: `Before running this: switch to Opus or Fable if you're not already on one — this review is meant to run on a stronger model than the one doing the building.
+
+Review the frontend code written this session.
+
+This is a code-quality review, not a design review (that's /design-review) and not a UX review (that's /ux-audit).
+
+Check:
+- Any obvious bugs or logic errors
+- Unnecessary complexity — anything that could be simpler without losing functionality
+- Prop drilling or state that's managed at the wrong level
+- Accessibility gaps in the actual markup (not just visual accessibility)
+- Any component that's doing too much and should be split
+- Dead code, unused imports, leftover placeholders
+- TypeScript types that are too loose (any, unknown without narrowing)
+
+Output: a prioritized list — CRITICAL (breaks something), SHOULD FIX (real but not urgent), NIT (optional polish). Fix CRITICAL items now if you find them.`,
       },
     ],
   },
@@ -789,6 +920,7 @@ Standards:
 - All errors caught and returned as structured JSON, never exposed stack traces
 - Auth checked before any data access — never after
 - Sensitive operations logged (not the data — the action)
+- Default to free-tier infrastructure. If an endpoint depends on a paid API or license (like a commercial data feed), build the endpoint and stub the response with a clear TODO rather than skipping it — we turn it on once it's worth paying for
 
 Tell me which endpoints we're building if I haven't specified. Build them in dependency order — don't build an endpoint that requires another that doesn't exist yet.
 
@@ -822,10 +954,10 @@ After setup:
       {
         active: true,
         cmd: "/auth-setup",
-        tip: "Sets up user authentication using Clerk or Firebase.",
+        tip: "Sets up user authentication.",
         prompt: `Set up authentication for this project.
 
-Use whatever auth solution fits our stack — Clerk for Next.js projects, Firebase Auth if that's our backend, Supabase Auth if we're on Supabase. Tell me which you're using and why before starting.
+Use whatever auth solution fits our stack and is free to start. Tell me which you're using and why before starting.
 
 Set up:
 1. Install and configure the auth provider
@@ -875,16 +1007,10 @@ Output as a flow diagram description or a step-by-step narrative for each major 
       {
         active: true,
         cmd: "/integrations",
-        tip: "Connects external services — Stripe, email, analytics, third party APIs.",
+        tip: "Connects external services — payments, email, analytics, third-party APIs. If something costs money, it gets built stubbed-off, not skipped.",
         prompt: `Set up the external service integrations for this project.
 
-Tell me which integrations we're setting up if I haven't specified. Common ones for this type of project:
-- Stripe (payments, subscriptions)
-- Resend or Postmark (transactional email)
-- Twilio or similar (SMS)
-- Analytics (PostHog, Mixpanel, or simple Plausible)
-- Error monitoring (Sentry)
-- External APIs specific to this project
+Tell me which integrations we're setting up if I haven't specified. Common ones: payments, transactional email, SMS, analytics, error monitoring, and any external API specific to this project.
 
 For each integration:
 1. Install the SDK
@@ -893,6 +1019,8 @@ For each integration:
 4. Test the connection
 5. Add error handling — external services go down, our app should handle it gracefully
 
+Cost handling: if an integration requires a paid plan or a commercial license we don't want to pay for yet (e.g. a data provider that requires a license once usage crosses a free threshold), build the integration and stub or feature-flag it off with a clear comment explaining what it costs and when it's worth turning on. Don't quietly drop the feature — leave it ready to switch on the moment there's revenue to justify it.
+
 Standards:
 - All API keys server-side only — never in the browser
 - Timeouts on all external calls — don't let a slow third-party hang our app
@@ -900,6 +1028,82 @@ Standards:
 - Fallback behavior when an integration fails (degrade gracefully, don't crash)
 
 When done: show me how to verify each integration is working without hitting production.`,
+      },
+      {
+        active: true,
+        cmd: "/code-review-backend",
+        tip: "Switch to Opus or Fable before running this. A focused review of the backend code built this session — auth, data access, error handling.",
+        prompt: `Before running this: switch to Opus or Fable if you're not already on one — this review is meant to run on a stronger model than the one doing the building.
+
+Review the backend code written this session.
+
+Check:
+- Auth checked before data access on every endpoint, never after
+- Any place user input reaches the database without validation
+- Error handling that leaks stack traces or internal details to the client
+- Any secret, key, or credential that isn't in an environment variable
+- N+1 queries or obviously inefficient data access
+- Race conditions in anything that reads-then-writes
+- Whether RLS or equivalent row-level access control is actually enforced, not just assumed
+
+Output: a prioritized list — CRITICAL (security or data-integrity issue), SHOULD FIX (real but not urgent), NIT (optional polish). Fix CRITICAL items now if you find them.`,
+      },
+    ],
+  },
+  {
+    col: "Redesign",
+    items: [
+      {
+        active: true,
+        cmd: "/redesign-check",
+        tip: "After a long coding jam, compares what actually got built against the original design intent and flags where they drifted apart.",
+        prompt: `Redesign check — has what we built drifted from what we intended?
+
+Compare the current, actual UI against the design principle and direction we set in /ui-brief (and any /component-map decisions).
+
+Tell me:
+- Where the built product still matches the original intent
+- Where it drifted — under time pressure, shortcuts get taken, and that's normal, so this isn't a blame exercise
+- Whether the drift is small (a fixable inconsistency) or big enough that the original design direction itself needs revisiting with /ui-brief again
+- If the project itself has grown or changed scope (check for a recent /pivot entry) — the original brief may no longer be the right target to measure against at all
+
+Give me a clear verdict: TIGHTEN (small fixes, same direction), RE-BRIEF (direction needs to change, go back to /ui-brief), or ON TRACK (no real drift, keep going).`,
+      },
+      {
+        active: true,
+        cmd: "/design-debt",
+        tip: "Audits the inconsistency that piles up from coding fast under pressure — one-off components, mismatched spacing, colors that snuck in outside the palette.",
+        prompt: `Audit design debt — the small inconsistencies that accumulate from building fast.
+
+Go through the current UI looking specifically for the kind of drift that happens under time pressure, not deliberate design decisions:
+
+- Spacing values that don't match the established scale (random 13px, 22px paddings next to a system that's otherwise 8/16/24/32)
+- Colors used outside the defined palette — one-off hex codes that snuck in
+- Multiple components doing the same job slightly differently (three different "card" styles that should be one)
+- Typography sizes or weights that don't match the established type scale
+- Inconsistent border-radius, shadow, or hover-state treatment across similar elements
+
+For each item found: where it is, what it should match, and how many places need the fix.
+
+Output: a prioritized cleanup list, ordered by how visible the inconsistency is to a user — not by how many files it touches.`,
+      },
+      {
+        active: true,
+        cmd: "/consistency-pass",
+        tip: "A full sweep for pattern violations across the whole built UI — the broader cleanup once design-debt has been identified.",
+        prompt: `Run a full consistency pass across the entire UI.
+
+This is broader than /design-debt — go screen by screen and check that every pattern is used the same way everywhere it appears:
+
+- Buttons: same states, same sizing logic, same hierarchy rules (when is something primary vs. secondary) everywhere
+- Forms: same validation style, same error presentation, same field spacing
+- Empty states, loading states, and error states: same visual language across every screen that has them
+- Navigation: same interaction pattern everywhere it appears
+- Icons: consistent style, weight, and sizing system
+
+For each inconsistency found: which screens disagree, which version should win (usually the most-used or most-recent pattern), and the fix.
+
+Apply the fixes directly where they're small and unambiguous. Flag anything that needs a judgment call from me before changing.`,
       },
     ],
   },
@@ -970,7 +1174,7 @@ MEDIUM PRIORITY:
 - Public API endpoints (if any): 30 per minute per IP
 
 Implementation requirements:
-- Use Upstash Redis for rate limiting in production (works with Vercel Edge)
+- Use a free-tier-friendly rate limiter that works with our hosting (e.g. Upstash Redis on the free tier)
 - Rate limit by IP for unauthenticated requests, by user ID for authenticated
 - Return 429 status with a Retry-After header when limit is hit
 - Never reveal the exact limit in the error message (security through obscurity)
@@ -986,10 +1190,10 @@ Show me the middleware setup and how to apply it per-route.`,
 
 Check everywhere a secret could accidentally end up in client-side code:
 
-NEXT.JS SPECIFIC
-- Any env variable used in a Client Component that doesn't start with NEXT_PUBLIC_?
-- Any env variable that DOES start with NEXT_PUBLIC_ that should be server-side only?
-- Any API keys passed as props from server components to client components?
+FRAMEWORK-SPECIFIC
+- Any env variable used in client-side code that isn't explicitly marked public (e.g. NEXT_PUBLIC_ prefix, or whatever our framework's convention is)?
+- Any env variable that IS marked public that should be server-side only?
+- Any API keys passed as props from server code to client components?
 
 CODE SCAN
 - Search for any hardcoded API keys, tokens, passwords, or secrets
@@ -1017,7 +1221,7 @@ Fix all CRITICAL and HIGH findings before this conversation ends.`,
         tip: "Full sweep for anything that shouldn't be public.",
         prompt: `Full secrets sweep. Find anything that shouldn't be visible.
 
-This is a paranoid check. Assume a motivated attacker has access to our public GitHub repo, our deployed Vercel app, and our browser's DevTools.
+This is a paranoid check. Assume a motivated attacker has access to our public GitHub repo, our deployed app, and our browser's DevTools.
 
 What can they find?
 
@@ -1049,7 +1253,7 @@ OUTPUT: Everything found, severity level, and the exact fix. Nothing gets dismis
       {
         active: true,
         cmd: "/qc",
-        tip: "Full quality check before anything ships. Every button, every form, every edge case.",
+        tip: "Full functional quality check before anything ships. Every button, every form, every dynamic element. For input-attack edge cases specifically, run /edge-cases.",
         prompt: `Full quality check. We are not shipping until this is clean.
 
 Go through the entire application like a hostile, confused, impatient user who is trying to break things.
@@ -1059,12 +1263,6 @@ FUNCTIONALITY
 - Every form: does it validate? Does it show errors clearly? Does it handle double-submission?
 - Every link: does it go where it says? Does it open in the right context (new tab vs. same tab)?
 - Every dynamic element: does it update when it should? Does stale data ever show?
-
-EDGE CASES
-- What happens with an empty state (no data, new user)?
-- What happens with 1 item? With 1000 items?
-- What happens if the network drops mid-action?
-- What happens if the user clicks back at a critical moment?
 
 ERROR STATES
 - Are all errors caught and shown to the user in plain language?
@@ -1076,12 +1274,14 @@ PERFORMANCE
 - Anything that blocks the page from being interactive?
 - Images optimized?
 
+This pass is about functionality, not malicious input — run /edge-cases separately for input-attack and abuse scenarios.
+
 OUTPUT: Ordered bug list. CRITICAL (blocks launch), HIGH (bad experience), MEDIUM (annoying), LOW (polish). Fix all CRITICAL before we ship.`,
       },
       {
         active: true,
         cmd: "/edge-cases",
-        tip: "What happens when things go wrong? Empty fields, huge uploads, duplicate accounts.",
+        tip: "What happens when things go wrong? Empty fields, huge uploads, duplicate accounts, malicious input.",
         prompt: `Edge case stress test. Assume every user is trying to break this.
 
 Go through every input, every form, every action and ask: what's the worst thing a user could do here?
@@ -1114,41 +1314,6 @@ OUTPUT: Every edge case found, expected behavior, actual behavior, and fix requi
       },
       {
         active: true,
-        cmd: "/3am-test",
-        tip: "The Baby Buddy standard. Sleep-deprived parent, one arm, phone, 3 seconds. If not, fix it.",
-        prompt: `Run the 3am test. This is the Baby Buddy standard and it applies to every project.
-
-The scenario: it's 3am. The user is exhausted. Baby in one arm, phone in the other hand. Brain barely working. 3 seconds of patience before they give up.
-
-Would they figure this out?
-
-FIRST SCREEN
-- Is the purpose of this app obvious in 3 seconds with no reading?
-- Is the primary action the biggest, most obvious thing on screen?
-- Is there anything on screen that would confuse or distract at 3am?
-
-CORE FLOW
-- Walk through the single most important thing a new user needs to do
-- Count every tap
-- Count every decision point
-- Count every field they have to fill out
-- Anything over 3 taps to get to value is a problem. Fix it.
-
-LANGUAGE
-- Any word a sleep-deprived person would have to think about?
-- Any error message that would make someone feel stupid?
-- Any label that's technically correct but confusing to a normal person?
-- Any confirmation dialog that's ambiguous? (OK / Cancel — OK to do what?)
-
-RECOVERY
-- If they make a mistake, can they fix it easily?
-- Are there any destructive actions with no undo?
-- If they close the app and come back, do they lose their progress?
-
-Verdict: would the 3am parent use this again, or delete it and go back to paper?`,
-      },
-      {
-        active: true,
         cmd: "/cross-device",
         tip: "Test on every device type. Phone, tablet, laptop, big monitor. Different browsers.",
         prompt: `Cross-device and cross-browser test. Nothing ships until this passes.
@@ -1156,11 +1321,11 @@ Verdict: would the 3am parent use this again, or delete it and go back to paper?
 Test matrix — go through every one:
 
 DEVICES
-- iPhone SE (375px) — smallest still-common phone
-- iPhone 14/15 (390px) — current standard
-- Android mid-range equivalent (360px, Chrome)
-- iPad (768px) — portrait
-- iPad (1024px) — landscape
+- Smallest common phone (375px)
+- Standard modern phone (390px)
+- Mid-range Android equivalent (360px, Chrome)
+- Tablet portrait (768px)
+- Tablet landscape (1024px)
 - Laptop (1280px)
 - Desktop (1440px+)
 
@@ -1169,7 +1334,6 @@ BROWSERS
 - Safari (latest) — desktop and iOS
 - Firefox (latest) — desktop
 - Edge (latest) — desktop
-- Samsung Internet — if targeting Android users
 
 FOR EACH COMBINATION CHECK:
 - Layout renders correctly — no overflow, no broken flex/grid
@@ -1182,7 +1346,7 @@ FOR EACH COMBINATION CHECK:
 
 ACCESSIBILITY BONUS
 - Tab through the entire page with keyboard only — can you reach everything?
-- Screen reader test on the primary flow (VoiceOver on iOS, TalkBack on Android)
+- Screen reader test on the primary flow
 
 OUTPUT: Matrix of what passes, what fails, and the exact fix for each failure.`,
       },
@@ -1202,14 +1366,14 @@ SECURITY
 PERFORMANCE
 - [ ] Lighthouse score above 80 on mobile
 - [ ] Core Web Vitals passing (LCP under 2.5s, CLS under 0.1)
-- [ ] Images optimized and using next/image or equivalent
+- [ ] Images optimized and using a modern image component
 - [ ] No unused dependencies in the bundle
 
 LEGAL & PRIVACY
 - [ ] Privacy policy exists and is linked from the app
 - [ ] Terms of service exists and is linked
 - [ ] Cookie consent banner if we use tracking (EU users)
-- [ ] Any COPPA or GDPR requirements addressed
+- [ ] Any applicable compliance requirements addressed (see the Legal column)
 - [ ] No personal data logged that shouldn't be
 
 FUNCTIONALITY
@@ -1222,10 +1386,27 @@ DEPLOYMENT
 - [ ] Environment variables set in production
 - [ ] Domain configured and HTTPS working
 - [ ] robots.txt configured correctly
-- [ ] Error monitoring active (Sentry or equivalent)
+- [ ] Error monitoring active
 - [ ] Analytics active
 
 Report: PASS / FAIL / N/A for each item. Fix all FAILs before launch.`,
+      },
+      {
+        active: true,
+        cmd: "/opus-opinion",
+        tip: "Switch to Opus before running this. A full, model-fresh audit of everything built so far — the deep double-check before you trust it.",
+        prompt: `Before running this: switch to Opus if you're not already on it. This is meant to be a fresh, strong-model pass over work that was mostly built on a faster/cheaper model — the point is a different set of eyes, not the same reasoning run twice.
+
+Do a full audit of the project as it stands right now. Don't just skim — actually read the code and the docs.
+
+Cover:
+- Anything that looks like it was built under time pressure and cut a corner it shouldn't have
+- Security issues that a fast build pass could plausibly have missed
+- Places where the code contradicts what project-state.md or the PRD says is true
+- Anything that would embarrass us if a sharp engineer reviewed this cold
+- Whether the current state actually matches what /pre-launch-check would need to pass, if we ran it right now
+
+Be blunt. This is the "no, seriously, is this actually okay" pass — treat it that way. Give me a prioritized list, not a pat on the back.`,
       },
     ],
   },
@@ -1235,7 +1416,7 @@ Report: PASS / FAIL / N/A for each item. Fix all FAILs before launch.`,
       {
         active: true,
         cmd: "/legal",
-        tip: "Full legal review. Terms of service, privacy policy, compliance flags.",
+        tip: "Full legal review. Terms of service, privacy policy, compliance flags — for this specific project, not a generic checklist.",
         prompt: `Full legal review for this project. Tell me what I need before this goes anywhere near the public.
 
 I'm not a lawyer and you're not giving legal advice — but tell me what a lawyer would flag and what I need to have in place.
@@ -1243,8 +1424,10 @@ I'm not a lawyer and you're not giving legal advice — but tell me what a lawye
 WHAT WE COLLECT
 - What personal data does this app collect, store, or process?
 - What's the minimum we actually need vs. what we're collecting?
-- Are we collecting anything from people under 13? (COPPA exposure)
-- Are we likely to have EU users? (GDPR exposure)
+- Are we collecting anything from people under 13? (COPPA exposure — see /coppa-check)
+- Are we likely to have EU users? (GDPR exposure — see /gdpr-review)
+- Are we handling health information? (HIPAA exposure — see /hipaa-check)
+- Are we handling payments directly? (PCI exposure — see /pci-check)
 
 DOCUMENTS NEEDED
 - Do we need a Terms of Service? What should it cover for this type of app?
@@ -1253,16 +1436,15 @@ DOCUMENTS NEEDED
 - Any other legal documents for this specific use case?
 
 COMPLIANCE FLAGS
-- Any specific regulatory regime that applies? (HIPAA for health, COPPA for children, CCPA for California, GDPR for EU)
-- Any industry-specific compliance requirements?
-- Are we handling payments? (PCI DSS considerations)
+- Which of the specific compliance checks in this column actually apply to us? Name them.
+- Any industry-specific compliance requirements this project has that aren't covered by a dedicated command yet?
 
 LIABILITY EXPOSURE
 - What's our biggest liability risk with this product?
 - What should the Terms of Service limit our liability for?
-- Any user-generated content concerns?
+- Any user-generated content concerns? (see /dmca-policy)
 
-OUTPUT: Prioritized list of what to address before launch vs. what can wait.`,
+OUTPUT: Prioritized list of what to address before launch vs. what can wait, and which dedicated Legal commands to run next.`,
       },
       {
         active: true,
@@ -1318,12 +1500,12 @@ Flag anything specific to this product that needs special language — payments,
       {
         active: true,
         cmd: "/coppa-check",
-        tip: "Baby Buddy specific. COPPA compliant? Data truly anonymous? Hash rotation in place?",
-        prompt: `COPPA compliance check — Baby Buddy / Keeper specific.
+        tip: "Children's privacy compliance. Only relevant if this project could realistically be used by, or collect data from, kids under 13 — check that first.",
+        prompt: `COPPA compliance check.
 
-This app involves children's data. That means COPPA applies and this is not optional.
+First: does this even apply? COPPA is about data from children under 13. If this project is clearly adults-only, has no reasonable appeal to children, and doesn't ask for age in a way that would attract them — say so plainly and stop here.
 
-Check the following:
+If it does apply, this is not optional. Check the following:
 
 DATA COLLECTION
 - Are we collecting any personally identifiable information about children under 13?
@@ -1341,13 +1523,9 @@ THIRD PARTIES
 - Have we reviewed their COPPA compliance?
 
 TECHNICAL CONTROLS
-- Hash rotation — is it implemented and scheduled?
-- Is there a data retention limit? (We should not keep data longer than necessary)
+- Hash rotation — is it implemented and scheduled, if applicable?
+- Is there a data retention limit?
 - Can we produce a data deletion receipt if a parent requests it?
-
-DOCUMENTATION
-- Is our privacy policy's children's section accurate and specific?
-- Do we have an internal data handling document?
 
 Output: compliance status per item, what's in place, what's missing, what needs a lawyer.`,
       },
@@ -1357,7 +1535,7 @@ Output: compliance status per item, what's in place, what's missing, what needs 
         tip: "European user compliance. Right to deletion, cookie consent, privacy by design.",
         prompt: `GDPR review. If we have any European users, this applies to us — no matter where we're based.
 
-Check every requirement:
+First: is this realistic for this project? If it's clearly local/regional with no path to EU users, say so and stop here. Otherwise, check every requirement:
 
 LAWFUL BASIS
 - What's our lawful basis for processing each type of data? (Consent, contract, legitimate interest?)
@@ -1382,11 +1560,146 @@ DATA PROTECTION
 - Do we have a data breach notification plan? (72 hours to notify authorities)
 - If we use any processors (third-party services), do we have data processing agreements with them?
 
-PRIVACY BY DESIGN
-- Do we collect minimum data necessary?
-- Do we have data retention limits?
-
 Output: compliant / non-compliant / needs review for each item, with specific fixes.`,
+      },
+      {
+        active: true,
+        cmd: "/hipaa-check",
+        tip: "Health data compliance. Only relevant if this project touches protected health information — check that first.",
+        prompt: `HIPAA compliance check.
+
+First: does this apply? HIPAA covers protected health information (PHI) handled by covered entities or their business associates. If this project doesn't touch health data, or only touches health data that's fully user-reported and non-clinical (like a general fitness log with no provider involvement), say so plainly and stop here.
+
+If it does apply:
+
+SCOPE
+- What specific PHI does this app touch — diagnoses, treatment info, insurance, provider communications?
+- Are we a covered entity, a business associate, or neither?
+
+TECHNICAL SAFEGUARDS
+- Is PHI encrypted in transit and at rest?
+- Is access to PHI logged and auditable?
+- Are we using unique user IDs, not shared logins, for anyone touching PHI?
+- Automatic logoff after inactivity?
+
+ADMINISTRATIVE
+- Do we have a designated privacy officer (even if that's just you)?
+- Do we have Business Associate Agreements (BAAs) with every third-party vendor that touches PHI (hosting, email, analytics)?
+- Most consumer-grade hosting/analytics tools do NOT sign BAAs — flag any vendor in our stack that's a problem here
+
+BREACH
+- Do we have a breach notification plan matching HIPAA's timeline requirements?
+
+Output: applies / doesn't apply, and if it applies, what's in place vs. missing, with a clear flag that this is a "get a lawyer before launch" category, not a DIY compliance area.`,
+      },
+      {
+        active: true,
+        cmd: "/ccpa-check",
+        tip: "California consumer privacy rights — distinct from GDPR, different deletion/opt-out mechanics. Only relevant if we're likely to have California users at scale.",
+        prompt: `CCPA (California Consumer Privacy Act) review.
+
+First: does this apply? CCPA has revenue/data-volume thresholds — a tiny solo project likely isn't covered yet, but the user-facing rights are good practice regardless. Tell me honestly whether we're likely covered now or just planning ahead.
+
+Check:
+- Right to know: can a California user find out what data we've collected about them?
+- Right to delete: can they delete it?
+- Right to opt out of sale/sharing of personal information — do we sell or share data with third parties in a way CCPA would count as "sale"?
+- Do we need a "Do Not Sell or Share My Personal Information" link?
+- Is our privacy policy's California-specific section accurate?
+- Non-discrimination: are we treating opt-out users any differently (we shouldn't be)?
+
+This is distinct from GDPR — the deletion and opt-out mechanics work differently, don't assume our GDPR compliance covers this.
+
+Output: whether we're likely covered, what's in place, what's missing.`,
+      },
+      {
+        active: true,
+        cmd: "/pci-check",
+        tip: "Payment card data compliance. Usually not needed if payments go through Stripe/equivalent and card data never touches our servers — check that first.",
+        prompt: `PCI DSS (payment card industry) check.
+
+First: how are we actually handling payments? If we're using Stripe, Paddle, or a similar processor's hosted checkout or Elements/embedded fields — where card numbers never touch our servers — our PCI scope is minimal (SAQ A territory) and this is mostly about confirming we haven't accidentally expanded scope. Tell me clearly which situation we're in.
+
+If card data never touches our servers, confirm:
+- We're not logging, storing, or transmitting raw card numbers anywhere
+- Our checkout flow uses the processor's hosted fields, not a custom form that collects card data directly
+- We're using HTTPS everywhere on any page involved in checkout
+
+If we ARE handling raw card data ourselves (uncommon, and I'd push back on why): flag that this requires real PCI compliance work — a formal SAQ, potentially a QSA — and is not something to DIY without expert help.
+
+Output: our actual PCI scope given how we're really processing payments, and what (if anything) needs to change.`,
+      },
+      {
+        active: true,
+        cmd: "/ip-check",
+        tip: "Trademark conflicts, copyright on content/assets, and open-source license obligations. More rigorous than /name-check — run this before a real public launch.",
+        prompt: `Intellectual property check before launch.
+
+TRADEMARK
+- Does our name or logo plausibly conflict with an existing registered trademark in our category?
+- This isn't a formal legal search — but flag anything that looks like a real risk, not just a coincidence
+
+COPYRIGHT
+- Are all images, fonts, icons, and content we're using either owned by us, properly licensed, or open-source with a license that permits our use?
+- Any AI-generated assets — do we understand the licensing/ownership situation for those?
+- Any content we copied or adapted from elsewhere that needs attribution or a license?
+
+OPEN SOURCE OBLIGATIONS
+- Go through our dependencies — any copyleft licenses (GPL, AGPL) that could obligate us to open-source our own code if we're not careful?
+- Are we complying with attribution requirements for the open-source libraries we use?
+
+OUTPUT: Anything found, severity, and the fix. If a genuine trademark conflict shows up, tell me clearly that this needs a real search or a lawyer, not just my judgment call.`,
+      },
+      {
+        active: true,
+        cmd: "/dmca-policy",
+        tip: "Needed the moment users can post content — comments, uploads, listings. Sets up the takedown process that protects us from liability for what they post.",
+        prompt: `Set up DMCA policy and process.
+
+First: does this apply? If users can post, upload, or share any content on this platform (comments, images, listings, files), it applies. If it's a fully closed system with no user-generated content, say so and stop here.
+
+If it applies:
+- Draft a DMCA policy page: how someone reports infringing content, what information we require in the notice, our response process
+- Explain safe harbor: to get DMCA safe harbor protection (limiting our liability for what users post), we need a registered DMCA agent and a real takedown process — not just a policy page nobody reads
+- What's the actual takedown workflow: who reviews reports, how fast do we act, how do we notify the user whose content was removed, what's the counter-notice process
+- Repeat infringer policy: what happens to users who get reported multiple times
+
+Output: the policy document, and a clear checklist of what needs to actually be operational (not just written) before this is real protection.`,
+      },
+      {
+        active: true,
+        cmd: "/accessibility-legal",
+        tip: "ADA/WCAG legal exposure — distinct from the UX-focused accessibility work in /mobile-check and /ux-audit. This is about lawsuit risk, which is real for web apps.",
+        prompt: `Accessibility legal exposure check.
+
+This is different from the UX-quality accessibility work elsewhere in the workflow — this is specifically about legal risk. Web accessibility lawsuits (ADA in the US, equivalent laws elsewhere) are a real and growing category, including against small businesses.
+
+Check against WCAG 2.1 AA as the practical legal baseline:
+- Can every interactive element be reached and operated with a keyboard alone?
+- Do all images have meaningful alt text?
+- Is there sufficient color contrast throughout (4.5:1 for normal text, 3:1 for large text)?
+- Do forms have properly associated labels, not just placeholder text?
+- Are error messages announced to screen readers, not just shown visually?
+- Is there a way to skip repetitive navigation?
+- Does anything rely on color alone to convey information?
+
+Output: a WCAG 2.1 AA gap list, prioritized by both how likely it is to trigger a real complaint and how easy it is to fix. Be honest that passing this checklist reduces risk — it doesn't eliminate it, and a genuinely litigious situation still needs a lawyer.`,
+      },
+      {
+        active: true,
+        cmd: "/incorporate-check",
+        tip: "LLC vs. sole prop, liability shield — legal readiness rather than compliance. Worth thinking about before real users and real money show up.",
+        prompt: `Business structure check — not compliance, but legal readiness.
+
+I'm not a lawyer or accountant and this isn't formal advice, but walk me through the decision:
+
+- At what point does operating as a sole proprietor become a real liability risk for this specific project? (Depends heavily on whether we handle money, health data, or anything litigation-prone)
+- What would an LLC actually protect against here, concretely — not in the abstract
+- Rough cost and effort to set one up, and whether it's worth doing now vs. waiting until there's real revenue or real users
+- Anything specific to this project (payments, user data, physical products) that raises the urgency of this decision
+- What I should ask an actual accountant or lawyer once I'm ready to act on this
+
+Output: a clear recommendation on timing — do this now, do this once we hit [specific milestone], or this genuinely doesn't matter yet for a project this size.`,
       },
     ],
   },
@@ -1396,37 +1709,41 @@ Output: compliant / non-compliant / needs review for each item, with specific fi
       {
         active: true,
         cmd: "/market",
-        tip: "Full CMO mode. Video concepts, Reddit threads, boost strategy, Product Hunt, SEO, press angle.",
-        prompt: `Full CMO mode. Build me the complete go-to-market picture for this project.
+        tip: "Full CMO mode. Talk through your instincts first, then get the complete go-to-market picture. For deep Reddit targeting specifically, run /reddit-hits.",
+        prompt: `Full CMO mode — build the go-to-market picture for this project.
+
+ROUND 1 — you talk
+Tell me every marketing idea, channel, or gut feeling you already have. Don't filter — platforms you're excited about, people you think would love this, half-formed launch ideas.
+
+ROUND 2 — I reflect back
+I'll organize what you gave me and tell you which instincts are strong and which are the obvious/standard move everyone tries.
+
+ROUND 3 — by the way
+I'll flag channels or angles you didn't mention that fit this specific project, and the mistakes founders commonly make on whichever channels you're leaning toward.
+
+Then, the full picture:
 
 ORGANIC CONTENT STRATEGY
-- Top 3 short-form video concepts that would perform for this app (TikTok/Reels format)
+- Top 3 short-form video concepts that would perform for this app
 - The emotional angle that gets shares — not features, the feeling
-- The creator archetype who would naturally talk about this
 
-REDDIT STRATEGY
-- Top 5 subreddits where our target users actually are
-- The type of post that would land (problem post, story post, tool share, etc.)
-- What NOT to do on Reddit (this is where most founders get it wrong)
+REDDIT
+- For deep subreddit-by-subreddit targeting, run /reddit-hits — here, just tell me in one line whether Reddit is a fit for this project at all and why
 
 SEO PLAY
 - The single highest-value keyword cluster for this product
 - The content type that would rank for it
-- Estimated timeline to see results
 
 PRODUCT HUNT
 - Is this a Product Hunt product? Why or why not?
-- If yes: what day/time to launch, what category, what tagline works
 
 PRESS ANGLE
-- What's the human story? (Not "new app does X" — the story behind why this exists)
-- Which specific journalists or publications cover this niche?
-- What's the hook that gets a journalist to open the pitch email?
+- What's the human story? Which specific journalists or publications cover this niche?
 
 LAUNCH SEQUENCE
 - Recommended order of marketing moves from day 1 to day 30
 
-Be specific. "Post on social media" is not a strategy. Name the subreddits. Write the video hook. Give me something I can act on today.`,
+Be specific. Name things. Give me something I can act on today, not a framework.`,
       },
       {
         active: true,
@@ -1571,10 +1888,19 @@ Write the actual copy. Don't give me a template — give me the words.`,
       {
         active: true,
         cmd: "/monetize",
-        tip: "CFO mode. Every possible way to make money. Affiliate, data, B2B, subscriptions, weird angles.",
-        prompt: `CFO mode. Spider-web every possible way this project makes money.
+        tip: "CFO mode. Talk through your instincts first, then get every possible way this makes money — the obvious plays and the weird angles.",
+        prompt: `CFO mode.
 
-I want the obvious plays and the weird angles. Don't filter yourself — throw everything and we'll evaluate.
+ROUND 1 — you talk
+Tell me every way you've thought this project could make money, even the half-formed or slightly embarrassing ideas. Don't filter yourself.
+
+ROUND 2 — I reflect back
+I'll organize what you gave me: which ideas are the standard/obvious play, which are genuinely sharp, and which might not hold up once we look closer.
+
+ROUND 3 — by the way
+I'll flag revenue angles you didn't mention that fit this specific project — including ones that don't seem obvious from the product itself.
+
+Then, the full spider-web:
 
 DIRECT REVENUE
 - Subscription: what tiers, what price points, what's in each tier?
@@ -1583,17 +1909,10 @@ DIRECT REVENUE
 - Freemium: what's locked behind the paywall that's worth paying for?
 
 INDIRECT REVENUE
-- Affiliate opportunities: who would pay us to send them users?
-- Data: what anonymized, aggregated data does this product generate that has value?
+- Affiliate opportunities: who would pay us to send them users? (See /affiliate-map for the deep dive)
+- Data: what anonymized, aggregated data does this product generate that has value? (See /data-play)
 - B2B / white label: could a company pay to offer this to their customers?
 - API access: could developers pay to access what we've built?
-
-WEIRD ANGLES
-- Partnership revenue (who benefits when our users succeed?)
-- Certification or credentialing (does expertise in this have value?)
-- Community or membership layer
-- Events, courses, or education
-- Adjacent product that becomes more valuable once we have this user base
 
 FOR EACH MODEL:
 - Revenue potential (rough ceiling for a solo founder)
@@ -1601,7 +1920,7 @@ FOR EACH MODEL:
 - Complexity to implement
 - Risk level
 
-At the end: rank the top 3 by the combination of revenue potential and ease of implementation. Tell me which one to focus on first.`,
+At the end: rank the top 3 by revenue potential and ease of implementation. Tell me which one to focus on first.`,
       },
       {
         active: true,
@@ -1642,10 +1961,12 @@ Output: ranked affiliate opportunities by revenue potential, with specific progr
       {
         active: true,
         cmd: "/data-play",
-        tip: "What anonymized data do we have that someone would pay for?",
+        tip: "What anonymized data do we have that someone would pay for? Only pursue this if the data genuinely has outside value — this command checks that first.",
         prompt: `Analyze the data play for this project.
 
-By running this product, we're going to accumulate data. Some of it has value. Let's figure out what it is, who wants it, and how to monetize it without compromising users.
+First, honestly: does this product generate data with real external value at all? Most small projects don't — be honest rather than manufacturing a monetization angle that isn't there. If the answer is no, say so clearly and stop here.
+
+If yes:
 
 WHAT DATA DO WE GENERATE?
 - List every type of data this product collects or creates through normal usage
@@ -1663,7 +1984,6 @@ THE BUSINESS MODEL OPTIONS
 - Data licensing: sell access to anonymized aggregate reports
 - Research partnerships: institutional access in exchange for funding or credibility
 - Proprietary insights product: we package the data into a separate B2B product
-- Data cooperative: users share data in exchange for something valuable to them
 
 LEGAL & TRUST REQUIREMENTS
 - What needs to be in the Privacy Policy before we can do any of this?
@@ -1676,7 +1996,7 @@ Only pursue data plays that we could announce publicly without losing user trust
       {
         active: true,
         cmd: "/pricing",
-        tip: "What should we charge? Free tier, paid tier, enterprise? What does the market bear?",
+        tip: "What should we charge? Free tier, paid tier, enterprise? Consider following with /grill-me if you're attached to a number that feels too safe.",
         prompt: `Figure out what we should charge for this product.
 
 I want a pricing strategy I can actually defend — not a number I picked because it felt reasonable.
@@ -1778,7 +2098,7 @@ LEGAL — MUST PASS ALL
 - [ ] Privacy Policy live and linked in the app
 - [ ] Terms of Service live and linked
 - [ ] Cookie consent in place if needed
-- [ ] Any required compliance (COPPA, GDPR) addressed
+- [ ] Any applicable compliance items from the Legal column addressed
 
 PERFORMANCE — MUST PASS ALL
 - [ ] Core user flow completes in under 3 seconds on a mid-range phone on LTE
@@ -1805,10 +2125,12 @@ Report every item: PASS / FAIL / N/A. Ship only when all MUST PASSes are green.`
       {
         active: true,
         cmd: "/app-store",
-        tip: "App Store and Google Play prep. Screenshots, description, keywords, privacy labels.",
+        tip: "App Store and Google Play prep — only relevant if this is actually a native/mobile app submission.",
         prompt: `Prepare this app for App Store and Google Play submission.
 
-Cover both stores — they have different requirements and different audiences.
+First: is this actually a native mobile app, or a web app? If it's web-only with no native wrapper, this doesn't apply — say so and stop here.
+
+If it is a native app, cover both stores — they have different requirements and different audiences.
 
 APP STORE (Apple)
 METADATA
@@ -1830,7 +2152,7 @@ PRIVACY LABELS
 
 GOOGLE PLAY
 - Short description (80 characters)
-- Full description (4000 characters — can differ from iOS, should be optimized for Play Store search)
+- Full description (4000 characters — optimized for Play Store search)
 - Content rating questionnaire — what applies to us?
 - Data safety section — what do we declare?
 
@@ -1939,6 +2261,163 @@ TARGETING
 - Why would their audience care?
 
 Write the full pitch. Then tell me who to send it to first and when.`,
+      },
+      {
+        active: true,
+        cmd: "/fable-opinion",
+        tip: "Switch to Fable before running this. A disciplined, slow-down final pass before shipping — catches what a fast pre-launch checklist run can miss.",
+        prompt: `Before running this: switch to Fable if you're not already on it. This is meant to be a slower, more disciplined pass than the mechanical /pre-launch-check — the goal is judgment, not just checkbox completion.
+
+We're about to ship. Before we do, walk through this project the way you'd want a careful colleague to, not the way a checklist would:
+
+- Does everything in project-state.md, the PRD, and what's actually built agree with each other? Flag any place they've quietly diverged.
+- Is there anything we're about to ship that we both know is a shortcut, and haven't actually decided is an acceptable one?
+- If this goes out today and gets real traffic in the next hour, what's the most likely thing to break, and are we actually ready for that?
+- Is there anything here that would make you, specifically, hesitate to put your name on it?
+
+Don't run through the mechanical checklist again — that's what /pre-launch-check and /launch-check are for. This is the "am I actually comfortable with this" pass. Be honest, even if the honest answer is "yes, ship it."`,
+      },
+    ],
+  },
+  {
+    col: "Operate",
+    items: [
+      {
+        active: true,
+        cmd: "/test-setup",
+        tip: "Scaffolds automated tests — unit and integration — for the project. Distinct from manual QA (/qc, /edge-cases), this is what runs on every future change.",
+        prompt: `Set up automated testing for this project.
+
+Manual QA (/qc, /edge-cases) catches problems once. Automated tests catch them every time something changes — that's the gap this fills.
+
+Do the following:
+1. Set up the testing framework appropriate for our stack
+2. Write unit tests for the core business logic — the functions where a bug would actually matter, not trivial getters/setters
+3. Write integration tests for the critical user flows (the same flows /qc identified as core)
+4. Set up the test runner to work in CI if we have one, or at minimum as a pre-commit or pre-deploy check
+5. Show me how to run the tests locally and read the output
+
+Prioritize: test the things that are expensive to get wrong (auth, payments, data mutations) over things that are cheap to notice visually (styling).
+
+When done: tell me what's covered, what's deliberately not covered yet and why, and the one command I run to check everything still works before I deploy.`,
+      },
+      {
+        active: true,
+        cmd: "/monitoring-setup",
+        tip: "What to log, what to alert on, and who gets notified when something breaks in production.",
+        prompt: `Set up monitoring and alerting for this project.
+
+I want to know when something breaks before a user has to tell me.
+
+LOGGING
+- What events should we be logging? (Errors, auth failures, payment events, rate limit hits — not routine successful requests)
+- Where do logs go, and how long do we keep them?
+- Are we logging anything sensitive that we shouldn't be?
+
+UPTIME
+- Set up uptime monitoring on the production URL and any critical API endpoints
+- What counts as "down" — a full outage, or also a slow response?
+
+ALERTING
+- What conditions should actually page/notify me? (Be selective — alert fatigue means I'll ignore all of them)
+- What's the notification channel — email, SMS, something else?
+- What's NOT worth alerting on, just logging for later review?
+
+ERROR TRACKING
+- Confirm error monitoring is capturing real errors with enough context to debug without reproducing them
+- Are errors grouped sensibly, or will one bug flood me with duplicate alerts?
+
+Keep this on the free tier where possible. Tell me the setup and what I should expect to see the first time something actually breaks.`,
+      },
+      {
+        active: true,
+        cmd: "/onboarding-flow",
+        tip: "The first-run experience — tours, empty states, activation. The moment that decides if a new user sticks around or bounces.",
+        prompt: `Design the onboarding flow for this project.
+
+This is about the first few minutes of a brand-new user's experience — distinct from /ux-audit's broader review, this is specifically about first impressions and activation.
+
+Walk me through:
+
+FIRST SCREEN
+- What does a user see the very first time, before they've done anything?
+- Is the core value obvious immediately, or does it require exploring first?
+
+ACTIVATION
+- What is the single action that, once a new user does it, makes them likely to come back? (Their "aha moment")
+- How many steps stand between signup and that moment right now?
+- What can we cut?
+
+GUIDANCE
+- Does this need an explicit tour/walkthrough, or should the interface be self-explanatory?
+- If a tour is needed: what are the 3-5 things it actually needs to show, no more
+- What happens if a user skips it — are they lost, or fine?
+
+EMPTY STATES
+- What does a new user see before they have any data? (An empty dashboard is a common first-impression failure — is ours helpful or just blank?)
+
+Output: the recommended first-run flow, step by step, and the single biggest thing currently standing between signup and activation.`,
+      },
+      {
+        active: true,
+        cmd: "/cost-audit",
+        tip: "What's actually driving the infrastructure bill, and where does it break at scale? Run this periodically, not just once.",
+        prompt: `Run a cost audit on this project's infrastructure.
+
+Go through everything we're paying for or could soon be paying for:
+- Hosting (what's the free tier limit, and how close are we?)
+- Database (storage, row count, query volume — where's the next pricing cliff?)
+- Any third-party API or service with usage-based pricing
+- Anything currently stubbed off waiting for revenue (check for TODO/feature-flag notes left by /integrations or /api-build) — are we close to needing to turn any of them on?
+
+For each: current usage, current cost (even if $0), and at what growth point the cost jumps to the next tier.
+
+Then:
+- What's the single biggest cost risk if this suddenly got 10x the traffic overnight?
+- Anything we're paying for that we're not actually using?
+- Anything free-tier that we're close to outgrowing and should plan for now rather than get surprised by a bill?
+
+Output: current monthly cost, projected cost at 10x scale, and the next decision point to watch for.`,
+      },
+      {
+        active: true,
+        cmd: "/support-setup",
+        tip: "How do users actually get help? Decide between help docs, a support inbox, or in-app chat before someone needs it.",
+        prompt: `Set up how users get support for this project.
+
+Decide, don't default:
+- Help docs / FAQ page: worth building now, or premature for our current user count?
+- Support inbox: a dedicated email address, and where do those messages actually land so they don't get lost?
+- In-app chat or contact form: is this worth the complexity yet, or is email enough for now?
+
+Then:
+- Draft the initial help doc / FAQ content for the 5-10 questions users will actually ask most
+- Set up whichever contact channel we decided on
+- What's the expected response time, and is that realistic for a solo founder?
+- What's the escalation path if something urgent comes in (a security report, a payment issue)?
+
+Keep this proportional to actual user count — don't build a full help center for ten users. Tell me the minimum viable support setup and what triggers upgrading it.`,
+      },
+      {
+        active: true,
+        cmd: "/backup-recovery",
+        tip: "Database backup strategy and what happens if a deploy breaks production. Boring until the day it saves you.",
+        prompt: `Set up backup and disaster recovery for this project.
+
+DATABASE BACKUPS
+- Is automatic backup enabled on our database provider, and what's the retention window?
+- How would we actually restore from a backup if we needed to — walk through the real steps, don't just confirm backups exist
+- What's our recovery point objective — how much data could we afford to lose if something went wrong right now?
+
+DEPLOYMENT ROLLBACK
+- If a deploy breaks production, what's the fastest path back to the last working version?
+- Is that rollback something I can do myself quickly, or does it require manual intervention?
+
+WORST CASE
+- If the database were completely lost tomorrow, what's the actual recovery plan, step by step?
+- If our hosting provider had a major outage, is there anything we'd lose that isn't backed up elsewhere (uploaded files, generated content)?
+
+Output: confirm what's already covered automatically by our providers, what we need to set up ourselves, and a one-page "if everything breaks, do this" runbook.`,
       },
     ],
   },
