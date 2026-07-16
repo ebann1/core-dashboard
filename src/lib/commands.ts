@@ -1064,10 +1064,38 @@ Compare the current, actual UI against the design principle and direction we set
 Tell me:
 - Where the built product still matches the original intent
 - Where it drifted — under time pressure, shortcuts get taken, and that's normal, so this isn't a blame exercise
-- Whether the drift is small (a fixable inconsistency) or big enough that the original design direction itself needs revisiting with /ui-brief again
+- Whether the drift is small (a fixable inconsistency) or big enough that the original design direction itself needs revisiting
 - If the project itself has grown or changed scope (check for a recent /pivot entry) — the original brief may no longer be the right target to measure against at all
 
-Give me a clear verdict: TIGHTEN (small fixes, same direction), RE-BRIEF (direction needs to change, go back to /ui-brief), or ON TRACK (no real drift, keep going).`,
+Give me a clear verdict: TIGHTEN (small fixes, same direction), RETHINK (the product itself has outgrown the original design premise — run /design-pivot, not just another brief), or ON TRACK (no real drift, keep going).`,
+      },
+      {
+        active: true,
+        cmd: "/design-pivot",
+        tip: "Not drift — growth. The product started simple and became something bigger; the screen in front of you still looks like the simple version. Time to rethink the design from scratch, not just tighten it.",
+        prompt: `This isn't about whether we drifted from the plan — it's about whether the plan itself is too small now.
+
+Something has changed: this started as a simple idea, and somewhere along the way it became a real product. That's a good thing. But what's on screen right now was designed for the version that existed on day one, not the version that exists today.
+
+First, ground this in reality:
+- What was the original concept, in one sentence?
+- What is this actually now? Pull from any /pivot entries and the current PRD — don't rely on memory alone
+- What's the gap between what the screen communicates and what the product has actually become? (A "cute toy" visual language on something that's now handling real user data or real money is the classic version of this gap)
+
+Then, the conversation:
+
+ROUND 1 — you talk
+Tell me how it feels different now. What does this deserve to look and feel like, given what it's actually grown into? Don't worry about what we already built — talk about what it should be.
+
+ROUND 2 — I reflect back
+I'll organize what you gave me and name the shift plainly: "this went from feeling like [X] to needing to feel like [Y]."
+
+ROUND 3 — by the way
+I'll flag what a more mature version of this product usually needs that a first pass skips — trust signals, information density done right, a visual language that can support monetization or scale, whatever's specific to how this one grew.
+
+Then: a new one-sentence design principle to replace the old one, and an honest read on how much of the current UI survives this rethink vs. needs to be rebuilt.
+
+This is a bigger moment than a typical /ui-brief refresh — treat it like we're designing this product for the first time, because in a real sense, we are.`,
       },
       {
         active: true,

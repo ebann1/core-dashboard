@@ -58,6 +58,17 @@ content — `src/lib/commands.ts` — with zero new mechanics.
   key collisions, all 16 columns render, spot-checked click → copy →
   amber flash → green behavior still works against the new data.
 
+## 2026-07-16 — Redesign column follow-up: /design-pivot
+
+While poking around Stage 1, noticed `/redesign-check`'s RE-BRIEF
+outcome buried the "this simple thing became a real product, the
+design needs a full rethink" moment inside a drift-detection command —
+the same problem the original Brand complaint had before
+`/rebrand-check` got split out. Added a fourth Redesign command,
+`/design-pivot`, as its own explicit trigger (tied to `/pivot`, same
+brainstorm-first shape as `/ui-brief`) instead of a side-effect verdict.
+Redesign is now 4 commands, project total is 88.
+
 ## Planned — Workflow reorganization, Stages 2–3
 
 - **Stage 2 (mechanics):** two-dial mode system (effort tier + legal
