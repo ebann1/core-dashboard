@@ -401,27 +401,41 @@ This is the most important command I run. Treat it that way.`,
         active: true,
         tier: "standard",
         cmd: "/brand-name",
-        tip: "The real naming session. Not the working title — the name that invokes what this project actually is, once you know the audience and the hook. Run this after Strategy, not before.",
-        prompt: `Naming session — for real this time, not a working title.
+        tip: "A real naming-agency process, not a spitball session — grounded in what the product actually does and who it's actually for. Run this after Strategy, not before.",
+        prompt: `You're acting as a professional naming strategist — the kind an agency puts on a rebrand, not a brainstorm buddy free-associating words. Every name you produce has to be traceable to a specific reason. Do not spitball, and do not give me a giant undifferentiated list.
 
-First, check: do we actually know who this is for and what the emotional hook is? If Strategy (PRD, viability) isn't settled yet, tell me to go finish that first — a name chosen before the project is understood is exactly how working titles turn into awkward mid-project rebrands.
+First, check: is Strategy (PRD, viability) actually settled? If not, tell me to go finish that first — naming before the project is understood is exactly how working titles turn into awkward mid-project rebrands.
 
-If we're ready, here's how this works:
+If we're ready, work through this in order — out loud, don't skip steps:
 
-ROUND 1 — you talk
-Just throw out names, feelings, words, anything that comes to mind about what this project should be called. No filtering. I'll catch it all.
+STEP 0 — GROUND IT
+State back, in one plain sentence, exactly what this product does and who it's for, pulled from the PRD. If you can't state the core function in one plain sentence, stop and ask me to clarify before doing anything else. The name has to be defensible against this sentence — if a candidate name gives zero hint what category of product this even is, that's a real cost, not a stylistic choice, and you need to flag it.
 
-ROUND 2 — I reflect back
-I'll organize what you gave me: which names are on-the-nose, which are clever, which accidentally undersell what this has become, and which ones actually capture the real emotional hook we identified in Strategy.
+STEP 1 — THE AUDIENCE, SPECIFICALLY
+Not "users" — the actual person. What's their taste? What brands, games, tools, or communities do they already love, and what do those names sound like? What subculture, if any, do they belong to? Ground this in the target user from the PRD, not a generic demographic.
 
-ROUND 3 — by the way
-I'll tell you what you didn't consider: names that are too close to competitors, names that lock you into a narrower niche than the product has grown into, and the difference between a name that's cute now and a name that still works if this becomes a real business.
+STEP 2 — THE EMOTIONAL CORE
+One sentence: what should someone feel in the half-second after hearing this name, before they know anything else? Pull this from the emotional hook already identified in Strategy — don't invent a new one now.
 
-Then: 8-10 candidate names, each with a one-line read on what it communicates and who it appeals to.
+STEP 3 — BRAND ARCHETYPE
+Pick one of the twelve classic brand archetypes — Hero, Sage, Explorer, Creator, Ruler, Magician, Innocent, Everyman, Lover, Jester, Caregiver, Rebel — that fits this product and this audience. State which one and why. Every candidate has to be consistent with it.
 
-It does not need to be a novel, unclaimed word — it needs to not obviously collide with an established brand in the same space. Run /name-check on your favorites once we've narrowed it down.
+STEP 4 — SOUND AND PATTERN, DELIBERATELY
+Hard plosives (K, P, T, X) read fast, punchy, technical. Soft sonorants (M, N, L, S) read calm, premium, trusted. Front vowels read quick and small; back vowels read solid and big. Pick the sound profile that matches the archetype and audience — state it. Then pick a naming pattern: descriptive (says what it does), suggestive (implies it), compound, coined, or metaphor — state which one and why.
 
-Ready when you are. Talk to me about the name.`,
+STEP 5 — GENERATE (10-12 candidates, not 80)
+For every candidate:
+- The name
+- Which naming pattern it uses
+- The one-line reason THIS specific audience responds to it — not a generic compliment that could apply to any product
+- Whether it obscures the product category, and if so, whether that's a real problem given how people will discover this
+
+STEP 6 — BY THE WAY
+Flag anything you generated that's actually a generic buzzword wearing a costume — words like Guardian, Nexus, Pulse, Vault, Forge that sound branded but say nothing about THIS product specifically. Don't include those in Step 5 in the first place; call it out here if you were tempted to. Also tell me what angle or naming pattern you skipped that's worth a second pass.
+
+Quality over volume. If you can't defend a name in one specific sentence tied to this product and this audience, don't include it. Run /name-check on your favorites once we've narrowed it down.
+
+Ready when you are.`,
       },
       {
         active: true,
